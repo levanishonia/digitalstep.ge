@@ -1,23 +1,8 @@
-import {
-  Bell, Boxes, CircleUserRound, Heart, Home, LayoutGrid, MessageCircle,
-  Settings, ShoppingBag, SlidersHorizontal, type LucideIcon,
-} from 'lucide-react'
-
-export type NavigationItem = { label: string; href: string; icon: LucideIcon }
-
+import { Boxes, CircleUserRound, Heart, Home, LayoutGrid, MessageCircle, Settings, ShoppingBag, type LucideIcon } from 'lucide-react'
+export type NavigationKey = 'main'|'marketplace'|'categories'|'orders'|'favorites'|'messages'|'profile'
+export type NavigationItem = { key: NavigationKey; href: string; icon: LucideIcon }
 export const primaryNavigation: NavigationItem[] = [
-  { label: 'მთავარი', href: '#main', icon: Home },
-  { label: 'მარკეტპლეისი', href: '#marketplace', icon: ShoppingBag },
-  { label: 'კატეგორიები', href: '#categories', icon: LayoutGrid },
-  { label: 'ჩემი შეკვეთები', href: '#orders', icon: Boxes },
-  { label: 'რჩეულები', href: '#favorites', icon: Heart },
-  { label: 'შეტყობინებები', href: '#messages', icon: MessageCircle },
-  { label: 'პროფილი', href: '#profile', icon: CircleUserRound },
+ {key:'main',href:'#main',icon:Home},{key:'marketplace',href:'#main',icon:ShoppingBag},{key:'categories',href:'#categories',icon:LayoutGrid},{key:'orders',href:'#main',icon:Boxes},{key:'favorites',href:'#main',icon:Heart},{key:'messages',href:'#main',icon:MessageCircle},{key:'profile',href:'#main',icon:CircleUserRound},
 ]
-
-export const settingsItem: NavigationItem = {
-  label: 'პარამეტრები', href: '#settings', icon: Settings,
-}
-
-export const mobileNavigation = [primaryNavigation[0], primaryNavigation[2], primaryNavigation[1], primaryNavigation[4], primaryNavigation[6]]
-export { Bell, SlidersHorizontal, ShoppingBag }
+export const settingsItem={key:'settings' as const,href:'#main',icon:Settings}
+export const mobileNavigation=[primaryNavigation[0],primaryNavigation[2],primaryNavigation[1],primaryNavigation[4],primaryNavigation[6]]
