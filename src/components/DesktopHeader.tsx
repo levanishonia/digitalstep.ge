@@ -1,28 +1,33 @@
 import { useId } from 'react'
 import { Bell, Search, ShoppingCart, SlidersHorizontal } from 'lucide-react'
+import type { Locale } from '../i18n'
+import { dictionary, localePath } from '../i18n'
 
-export function SearchField() {
+export function SearchField({locale}:{locale:Locale}) {
   const searchId = useId()
+  const t = dictionary[locale].shell
 
   return (
     <form className="search" role="search" onSubmit={(event) => event.preventDefault()}>
       <Search aria-hidden="true" />
-      <label className="visually-hidden" htmlFor={searchId}>მომსახურების ძიება</label>
-      <input id={searchId} type="search" placeholder="მოძებნე მომსახურება..." />
-      <button type="button" aria-label="ძიების ფილტრები"><SlidersHorizontal aria-hidden="true" /></button>
+      <label className="visually-hidden" htmlFor={searchId}>{t.search}</label>
+      <input id={searchId} type="search" placeholder={t.searchPlaceholder} />
+      <button type="button" aria-label={t.filters}><SlidersHorizontal aria-hidden="true" /></button>
     </form>
   )
 }
 
-export function DesktopHeader() {
+export function DesktopHeader({locale}:{locale:Locale}) {
+  const t=dictionary[locale].shell
   return (
     <header className="desktop-header">
-      <SearchField />
+      <SearchField locale={locale} />
       <div className="header-actions">
-        <button className="icon-button" type="button" aria-label="კალათა"><ShoppingCart aria-hidden="true" /></button>
-        <button className="icon-button has-notice" type="button" aria-label="შეტყობინებები"><Bell aria-hidden="true" /></button>
-        <button className="account" type="button" aria-label="ანგარიშის მენიუ">
-          <span className="avatar">ნ</span><span><strong>ნიკა</strong><small>მყიდველი</small></span>
+        <a className="language-switch" href={localePath(locale==='ka'?'en':'ka','/')}>{t.language}</a>
+        <button className="icon-button" type="button" aria-label={t.cart}><ShoppingCart aria-hidden="true" /></button>
+        <button className="icon-button has-notice" type="button" aria-label={t.notifications}><Bell aria-hidden="true" /></button>
+        <button className="account" type="button" aria-label={t.account}>
+          <span className="avatar">DS</span><span><strong>Digital Step</strong><small>{t.buyer}</small></span>
         </button>
       </div>
     </header>

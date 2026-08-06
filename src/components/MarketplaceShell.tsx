@@ -1,25 +1,21 @@
-import { Sparkles } from 'lucide-react'
 import { AppSidebar } from './AppSidebar'
 import { DesktopHeader } from './DesktopHeader'
 import { MobileBottomNavigation, MobileHeader } from './MobileNavigation'
+import type { Locale } from '../i18n'
+import { MarketplaceHomepage } from './marketplace/Homepage'
 
-export function MarketplaceShell() {
+export function MarketplaceShell({locale}:{locale:Locale}) {
   return (
     <div className="app-shell">
-      <AppSidebar />
-      <MobileHeader />
+      <AppSidebar locale={locale} />
+      <MobileHeader locale={locale} />
       <div className="desktop-area">
-        <DesktopHeader />
+        <DesktopHeader locale={locale} />
         <main id="main" className="main-content">
-          <section className="layout-placeholder" id="marketplace">
-            <span><Sparkles aria-hidden="true" /></span>
-            <p className="eyebrow">Digital Step Marketplace</p>
-            <h1>იპოვე საჭირო ციფრული სერვისი</h1>
-            <p>მარკეტპლეისის ახალი გამოცდილება მალე აქ გამოჩნდება.</p>
-          </section>
+          <MarketplaceHomepage locale={locale}/>
         </main>
       </div>
-      <MobileBottomNavigation />
+      <MobileBottomNavigation locale={locale} />
     </div>
   )
 }
