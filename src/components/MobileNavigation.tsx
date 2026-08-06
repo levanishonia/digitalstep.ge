@@ -21,7 +21,13 @@ export function MobileBottomNavigation() {
       {mobileNavigation.map(({ label, href, icon: Icon }, index) => {
         const isCenter = index === 2
         return (
-          <a key={label} href={href} className={isCenter ? 'marketplace-action' : index === 0 ? 'active' : undefined} aria-label={label}>
+          <a
+            key={label}
+            href={href}
+            className={isCenter ? 'marketplace-action active' : undefined}
+            aria-current={isCenter ? 'page' : undefined}
+            aria-label={label}
+          >
             {isCenter ? <span><ShoppingBag aria-hidden="true" /></span> : <Icon aria-hidden="true" />}
             <small>{isCenter ? 'მარკეტი' : label}</small>
           </a>

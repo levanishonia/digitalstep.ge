@@ -1,11 +1,14 @@
+import { useId } from 'react'
 import { Bell, Search, ShoppingCart, SlidersHorizontal } from 'lucide-react'
 
 export function SearchField() {
+  const searchId = useId()
+
   return (
     <form className="search" role="search" onSubmit={(event) => event.preventDefault()}>
       <Search aria-hidden="true" />
-      <label className="visually-hidden" htmlFor="marketplace-search">მომსახურების ძიება</label>
-      <input id="marketplace-search" type="search" placeholder="მოძებნე მომსახურება..." />
+      <label className="visually-hidden" htmlFor={searchId}>მომსახურების ძიება</label>
+      <input id={searchId} type="search" placeholder="მოძებნე მომსახურება..." />
       <button type="button" aria-label="ძიების ფილტრები"><SlidersHorizontal aria-hidden="true" /></button>
     </form>
   )

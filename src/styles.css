@@ -16,7 +16,7 @@ a { color: inherit; text-decoration: none; }
 button { color: inherit; }
 :focus-visible { outline: 2px solid var(--secondary); outline-offset: 3px; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-.sidebar { position: fixed; inset: 0 auto 0 0; z-index: 20; display: flex; flex-direction: column; width: 244px; padding: 28px 18px 20px; background: var(--sidebar); border-right: 1px solid var(--border); }
+.sidebar { position: fixed; inset: 0 auto 0 0; z-index: 20; display: flex; flex-direction: column; width: 244px; padding: 28px 18px 20px; overflow-x: hidden; overflow-y: auto; background: var(--sidebar); border-right: 1px solid var(--border); scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.14) transparent; }
 .logo { display: inline-flex; align-items: center; gap: 10px; min-height: 38px; width: fit-content; }
 .logo-mark { position: relative; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: var(--primary); transform: rotate(-8deg); }
 .logo-mark::before, .logo-mark span { content: ""; display: block; width: 12px; height: 5px; border: 2px solid white; border-left: 0; border-radius: 1px 4px 4px 1px; }
