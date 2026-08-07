@@ -1,5 +1,6 @@
 export const locales = ['ka', 'en'] as const
 export type Locale = (typeof locales)[number]
+export type LocalizedText = Record<Locale, string>
 
 export const dictionary = {
   ka: {
