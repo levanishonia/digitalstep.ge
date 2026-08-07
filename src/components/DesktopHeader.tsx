@@ -19,11 +19,12 @@ export function SearchField({locale}:{locale:Locale}) {
 
 export function DesktopHeader({locale}:{locale:Locale}) {
   const t=dictionary[locale].shell
+  const languageHref=localePath(locale==='ka'?'en':'ka',`${window.location.pathname}${window.location.search}${window.location.hash}`)
   return (
     <header className="desktop-header">
       <SearchField locale={locale} />
       <div className="header-actions">
-        <a className="language-switch" href={localePath(locale==='ka'?'en':'ka','/')}>{t.language}</a>
+        <a className="language-switch" href={languageHref}>{t.language}</a>
         <button className="icon-button" type="button" aria-label={t.cart}><ShoppingCart aria-hidden="true" /></button>
         <button className="icon-button has-notice" type="button" aria-label={t.notifications}><Bell aria-hidden="true" /></button>
         <button className="account" type="button" aria-label={t.account}>
