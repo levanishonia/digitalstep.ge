@@ -27,9 +27,9 @@ export function DesktopHeader({locale}:{locale:Locale}) {
         <a className="language-switch" href={languageHref}>{t.language}</a>
         <button className="icon-button" type="button" aria-label={t.cart}><ShoppingCart aria-hidden="true" /></button>
         <button className="icon-button has-notice" type="button" aria-label={t.notifications}><Bell aria-hidden="true" /></button>
-        <button className="account" type="button" aria-label={t.account}>
+        <a className="account" href={localePath(locale, '/login')} aria-label={t.account}>
           <span className="avatar">DS</span><span><strong>Digital Step</strong><small>{t.buyer}</small></span>
-        </button>
+        </a>
       </div>
     </header>
   )
