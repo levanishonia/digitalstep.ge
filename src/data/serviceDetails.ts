@@ -34,18 +34,29 @@ const faqs=(key:string):Faq[]=>[
  {id:`${key}-f3`,question:l('შესწორებები შედის პაკეტში?','Are revisions included?'),answer:l('დიახ, თითოეულ პაკეტში მითითებულია შესწორებების რაოდენობა.','Yes. Each package clearly states its included revision count.')},
  {id:`${key}-f4`,question:l('შეიძლება ინდივიდუალური პაკეტის მოთხოვნა?','Can I request a custom package?'),answer:l('კონსულტაციის ფუნქციის დამატების შემდეგ შესაძლებელი იქნება საჭიროების განხილვა.','Once consultation is available, you will be able to discuss a tailored scope.')},
 ]
-const detailSeeds=[
- ['social-management','growth-studio','social',299],['business-website','webcraft','web',799],['seo-audit','digital-step-team','seo',249],['brand-identity','brand-works','brand',449],['ad-campaign','growth-studio','ads',349],
-] as const
-export const serviceDetails:ServiceDetail[]=detailSeeds.map(([serviceId,providerSlug,tone,base])=>({serviceId,providerSlug,longDescription:l('ეს მომსახურება აერთიანებს სტრატეგიულ დაგეგმვასა და პრაქტიკულ შესრულებას. სამუშაო იწყება მკაფიო მოთხოვნებით და სრულდება გამოსაყენებლად მზად მასალებით.','This service combines strategic planning with practical execution. Work begins with a clear brief and ends with ready-to-use deliverables.'),gallery:gallery(tone),packages:packages(base),included:features,process,reviews:reviews(serviceId),faq:faqs(serviceId),relatedIds:catalogServices.filter(s=>s.id!==serviceId).slice(0,4).map(s=>s.id)}))
+const slugify=(value:string)=>value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')
+export const serviceDetails:ServiceDetail[]=catalogServices.map(service=>({
+ serviceId:service.id,
+ providerSlug:slugify(service.provider),
+ longDescription:l('ეს მომსახურება აერთიანებს სტრატეგიულ დაგეგმვასა და პრაქტიკულ შესრულებას. სამუშაო იწყება მკაფიო მოთხოვნებით და სრულდება გამოსაყენებლად მზად მასალებით.','This service combines strategic planning with practical execution. Work begins with a clear brief and ends with ready-to-use deliverables.'),
+ gallery:gallery(service.preview),
+ packages:packages(service.price),
+ included:features,
+ process,
+ reviews:reviews(service.id),
+ faq:faqs(service.id),
+ relatedIds:catalogServices.filter(candidate=>candidate.id!==service.id&&candidate.category===service.category).concat(catalogServices.filter(candidate=>candidate.id!==service.id&&candidate.category!==service.category)).slice(0,4).map(candidate=>candidate.id),
+}))
 const portfolio=(tone:string):PortfolioItem[]=>[
  {id:`${tone}-1`,title:l('ზრდის კამპანია','Growth Campaign'),category:l('სტრატეგია','Strategy'),description:l('ერთიანი ვიზუალური და საკომუნიკაციო სისტემა.','A cohesive visual and communication system.'),tone},
  {id:`${tone}-2`,title:l('ციფრული განახლება','Digital Refresh'),category:l('დიზაინი','Design'),description:l('მობილურზე მორგებული ციფრული გამოცდილება.','A mobile-ready digital experience.'),tone:`${tone} alt`},
  {id:`${tone}-3`,title:l('შედეგების დაფა','Results Dashboard'),category:l('ანალიტიკა','Analytics'),description:l('მთავარი მაჩვენებლების მარტივი ხედვა.','A clear view of the most important metrics.'),tone:`${tone} bright`},
 ]
-export const providers:Provider[]=[
- ['growth-studio','Growth Studio','growth'],['webcraft','WebCraft','web'],['digital-step-team','Digital Step Team','step'],['brand-works','Brand Works','brand'],['motion-lab','Motion Lab','video'],['automatex','AutomateX','ai'],
-].map(([slug,name,tone])=>({id:slug,slug,name,type:l('ციფრული სააგენტო','Digital agency'),tagline:l('მკაფიო სტრატეგია, ხარისხიანი შესრულება.','Clear strategy, thoughtful execution.'),description:l('ვქმნით პრაქტიკულ ციფრულ გადაწყვეტილებებს ბიზნესის გაზომვადი მიზნებისთვის. ყველა მონაცემი ამ პროფილზე სადემონსტრაციოა.','We create practical digital solutions for measurable business goals. All profile data shown here is demonstrative.'),location:l('თბილისი, საქართველო','Tbilisi, Georgia'),responseTime:l('დაახლოებით 2 საათი','About 2 hours'),completedProjects:128,specializations:[l('სტრატეგია','Strategy'),l('დიზაინი','Design'),l('ზრდა','Growth')],languages:['ქართული','English'],portfolio:portfolio(tone),reviews:reviews(slug)}))
+const providerServices=[...new Map(catalogServices.map(service=>[service.provider,service])).values()]
+export const providers:Provider[]=providerServices.map(service=>{
+ const slug=slugify(service.provider)
+ return {id:slug,slug,name:service.provider,type:l('ციფრული სააგენტო','Digital agency'),tagline:l('მკაფიო სტრატეგია, ხარისხიანი შესრულება.','Clear strategy, thoughtful execution.'),description:l('ვქმნით პრაქტიკულ ციფრულ გადაწყვეტილებებს ბიზნესის გაზომვადი მიზნებისთვის. ყველა მონაცემი ამ პროფილზე სადემონსტრაციოა.','We create practical digital solutions for measurable business goals. All profile data shown here is demonstrative.'),location:l('თბილისი, საქართველო','Tbilisi, Georgia'),responseTime:l('დაახლოებით 2 საათი','About 2 hours'),completedProjects:128,specializations:[l('სტრატეგია','Strategy'),l('დიზაინი','Design'),l('ზრდა','Growth')],languages:['ქართული','English'],portfolio:portfolio(service.preview),reviews:reviews(slug)}
+})
 export const getServiceBySlug=(slug:string)=>catalogServices.find(service=>service.slug===slug)
 export const getServiceDetail=(serviceId:string)=>serviceDetails.find(detail=>detail.serviceId===serviceId)
 export const getProviderBySlug=(slug:string)=>providers.find(provider=>provider.slug===slug)
