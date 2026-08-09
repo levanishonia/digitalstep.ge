@@ -11,8 +11,9 @@ import { RequireAuth } from './auth/RequireAuth'
 import { RequireRole } from './auth/RequireRole'
 import { ProviderLayout } from './components/provider/ProviderLayout'
 import { ProviderDashboard, ProviderOrderDetail, ProviderOrders, ProviderProfile } from './components/provider/ProviderPages'
-import { AssistantPage, BusinessAnalysisPage, ContentCalendarPage, ContentIdeasPage, MarketingPlannerPage, PostGeneratorPage, StudioHome, StudioLayout } from './components/studio/StudioPages'
+import { BusinessAnalysisPage, ContentCalendarPage, ContentIdeasPage, MarketingPlannerPage, PostGeneratorPage, StudioHome, StudioLayout } from './components/studio/StudioPages'
 import { BusinessPage, PricingPage } from './components/studio/BusinessAndPricing'
+import { AssistantPage } from './components/studio/AssistantPage'
 
 export function App() {
   const locale = resolveLocale(window.location.pathname)
