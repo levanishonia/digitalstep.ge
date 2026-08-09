@@ -8,6 +8,9 @@ import { DashboardOverview, OrderDetailPage, OrdersPage, ProfilePage } from './c
 import { FavoritesPlaceholder, SettingsPage } from './components/dashboard/SettingsPage'
 import { MessagesPage } from './components/dashboard/MessagesPage'
 import { RequireAuth } from './auth/RequireAuth'
+import { RequireRole } from './auth/RequireRole'
+import { ProviderLayout } from './components/provider/ProviderLayout'
+import { ProviderDashboard, ProviderOrderDetail, ProviderOrders, ProviderProfile } from './components/provider/ProviderPages'
 
 export function App() {
   const locale = resolveLocale(window.location.pathname)
@@ -15,6 +18,10 @@ export function App() {
   const segments=window.location.pathname.split('/').filter(Boolean).slice(1)
   const authPage=segments[0]==='login'?<LoginPage locale={locale}/>:segments[0]==='register'?<RegisterPage locale={locale}/>:segments[0]==='forgot-password'?<ForgotPasswordPage locale={locale}/>:null
   if(authPage)return <AuthLayout locale={locale}>{authPage}</AuthLayout>
+  if(segments[0]==='provider'){
+    const page=segments[1]==='orders'&&segments[2]?<ProviderOrderDetail locale={locale} id={segments[2]}/>:segments[1]==='orders'?<ProviderOrders locale={locale}/>:segments[1]==='profile'?<ProviderProfile locale={locale}/>:<ProviderDashboard locale={locale}/>
+    return <RequireRole locale={locale} role="PROVIDER"><ProviderLayout locale={locale}>{page}</ProviderLayout></RequireRole>
+  }
   if(segments[0]==='dashboard'){
     const page=segments[1]==='orders'&&segments[2]?<OrderDetailPage locale={locale} id={segments[2]}/>:segments[1]==='orders'?<OrdersPage locale={locale}/>:segments[1]==='profile'?<ProfilePage locale={locale}/>:segments[1]==='settings'?<SettingsPage locale={locale}/>:segments[1]==='messages'?<MessagesPage locale={locale} conversationId={segments[2]}/>:segments[1]==='favorites'?<FavoritesPlaceholder locale={locale}/>:<DashboardOverview locale={locale}/>
     return <RequireAuth locale={locale}><DashboardLayout locale={locale}>{page}</DashboardLayout></RequireAuth>
