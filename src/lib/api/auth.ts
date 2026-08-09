@@ -1,7 +1,7 @@
 import type { Locale } from '../../i18n'
 
 export type UserRole = 'CUSTOMER' | 'PROVIDER' | 'ADMIN'
-export interface AuthUser { id:string; firstName:string; lastName:string; email:string; phone:string|null; role:UserRole; preferredLocale:Locale }
+export interface AuthUser { id:string; firstName:string; lastName:string; email:string; phone:string|null; role:UserRole; preferredLocale:Locale; providerSlug:string|null }
 export type ApiErrorCode = 'INVALID_CREDENTIALS'|'EMAIL_ALREADY_EXISTS'|'VALIDATION_ERROR'|'PAYLOAD_TOO_LARGE'|'UNAUTHENTICATED'|'FORBIDDEN'|'INTERNAL_ERROR'|'RATE_LIMITED'|'NETWORK_ERROR'
 export class AuthApiError extends Error { constructor(public code:ApiErrorCode) { super(code) } }
 

@@ -4,6 +4,7 @@ import helmet from 'helmet'
 import path from 'node:path'
 import { authRouter } from './routes/auth.js'
 import { ordersRouter } from './routes/orders.js'
+import { providerOrdersRouter } from './routes/providerOrders.js'
 
 export const app = express()
 app.disable('x-powered-by')
@@ -16,6 +17,7 @@ app.use(cookieParser())
 app.get('/api/health', (_request, response) => response.json({ status: 'ok' }))
 app.use('/api/auth', authRouter)
 app.use('/api/orders', ordersRouter)
+app.use('/api/provider/orders', providerOrdersRouter)
 app.use('/api', (_request, response) => response.status(404).json({ error: { code: 'NOT_FOUND' } }))
 
 // Both development and the compiled server are started from the repository root.

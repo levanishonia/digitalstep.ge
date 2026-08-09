@@ -1,0 +1,6 @@
+import type { ApiOrder,OrderStatus } from './orders'
+export interface ProviderOrder extends ApiOrder{customer:{firstName:string;lastName:string}|null}
+export type ProviderOrderErrorCode='ORDER_NOT_FOUND'|'INVALID_STATUS_TRANSITION'|'FORBIDDEN'|'UNAUTHENTICATED'|'INTERNAL_ERROR'|'NETWORK_ERROR'
+export class ProviderOrderApiError extends Error{constructor(public code:ProviderOrderErrorCode){super(code)}}
+async function request<T>(path:string,options?:RequestInit){let response:Response;try{response=await fetch(path,{...options,credentials:'include',headers:{'Content-Type':'application/json',...options?.headers}})}catch{throw new ProviderOrderApiError('NETWORK_ERROR')}const body=await response.json().catch(()=>null) as {data?:T;error?:{code?:ProviderOrderErrorCode}}|null;if(!response.ok||!body?.data)throw new ProviderOrderApiError(body?.error?.code??'INTERNAL_ERROR');return body.data}
+export const providerOrdersApi={list:()=>request<{orders:ProviderOrder[]}>('/api/provider/orders'),get:(id:string)=>request<{order:ProviderOrder}>(`/api/provider/orders/${encodeURIComponent(id)}`),updateStatus:(id:string,status:OrderStatus)=>request<{order:ProviderOrder}>(`/api/provider/orders/${encodeURIComponent(id)}/status`,{method:'PATCH',body:JSON.stringify({status})})}
