@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently \"vite --host 0.0.0.0\" \"tsx watch server/index.ts\"",
     "build": "prisma generate && tsc -b && tsc -p tsconfig.server.json && vite build",
-    "start": "node server-dist/index.js",
+    "start": "node server-dist/server/index.js",
     "lint": "eslint .",
     "preview": "vite preview --host 0.0.0.0",
     "db:migrate": "prisma migrate deploy",
