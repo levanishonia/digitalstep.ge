@@ -252,8 +252,11 @@ button:disabled,[aria-disabled="true"] { cursor: not-allowed; opacity: .58; }
   .ai-composer { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
 }
 @media (max-width:430px) {
-  .service-grid { grid-template-columns: 1fr; }
-  .service-card { max-width: 100%; }
+  .service-grid,.related-section .service-grid,.recommendations .service-grid {
+    display: grid; grid-template-columns: minmax(0,1fr); margin-right: 0; padding-right: 0;
+    overflow: visible; scroll-snap-type: none;
+  }
+  .service-grid .service-card,.recommendations .service-card { flex: none; width: auto; max-width: 100%; }
   .service-title { min-height: 0; }
   .hero-actions { flex-direction: column; }
   .hero-actions .button { width: 100%; }
