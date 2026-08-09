@@ -75,6 +75,8 @@ model User {
   aiConversations  AIConversation[]
   aiUsage          AIUsage[]
   aiReservations   AIUsageReservation[]
+  aiGenerations    AIGeneration[]
+  contentItems     ContentItem[]
 }
 
 enum AIMessageRole {
@@ -84,6 +86,50 @@ enum AIMessageRole {
 
 enum AIFeature {
   AI_ASSISTANT
+  POST_GENERATOR
+}
+
+model AIGeneration {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessProfileId String?
+  feature AIFeature
+  inputJson Json
+  outputJson Json
+  createdAt DateTime @default(now())
+  contentItems ContentItem[]
+  @@index([userId, feature, createdAt])
+}
+
+enum ContentStatus {
+  IDEA
+  DRAFT
+  READY
+  SCHEDULED
+  PUBLISHED
+}
+enum ContentSource {
+  MANUAL
+  AI_POST_GENERATOR
+}
+model ContentItem {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessProfileId String?
+  title String
+  caption String
+  platform SocialPlatform
+  contentType String @default("POST")
+  status ContentStatus @default(IDEA)
+  scheduledAt DateTime?
+  source ContentSource @default(MANUAL)
+  sourceGenerationId String?
+  sourceGeneration AIGeneration? @relation(fields: [sourceGenerationId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([userId, scheduledAt])
 }
 
 model AIConversation {
