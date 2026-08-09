@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { authApi, type AuthUser } from '../lib/api/auth'
 import type { Locale } from '../i18n'
 
-interface AuthContextValue { user:AuthUser|null; loading:boolean; login:(email:string,password:string)=>Promise<void>; register:(input:{firstName:string;lastName:string;email:string;phone?:string;password:string;role:'CUSTOMER'|'PROVIDER';preferredLocale:Locale})=>Promise<void>; logout:()=>Promise<void> }
+interface AuthContextValue { user:AuthUser|null; loading:boolean; login:(email:string,password:string)=>Promise<void>; register:(input:{firstName:string;lastName:string;email:string;phone?:string;password:string;role:'CUSTOMER'|'PROVIDER';preferredLocale:Locale;termsAccepted:true})=>Promise<void>; logout:()=>Promise<void> }
 const AuthContext=createContext<AuthContextValue|null>(null)
 export function AuthProvider({children}:{children:ReactNode}){
  const [user,setUser]=useState<AuthUser|null>(null);const [loading,setLoading]=useState(true)

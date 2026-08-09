@@ -7,6 +7,9 @@ import { authRouter } from './routes/auth.js'
 
 export const app = express()
 app.disable('x-powered-by')
+// Railway terminates HTTPS one hop in front of the service. Trust only that hop
+// so request.ip (and therefore the auth rate limiter) identifies the client.
+app.set('trust proxy', 1)
 app.use(helmet({ contentSecurityPolicy: false }))
 app.use(express.json({ limit: '100kb' }))
 app.use(cookieParser())
@@ -20,6 +23,15 @@ app.use((_request, response) => response.sendFile(path.join(root, 'dist', 'index
 
 const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => {
   void _next
+  const reportedStatus = typeof error === 'object' && error !== null
+    ? Number('status' in error ? error.status : 'statusCode' in error ? error.statusCode : 500)
+    : 500
+  const status = Number.isInteger(reportedStatus) && reportedStatus >= 400 && reportedStatus <= 599 ? reportedStatus : 500
+  if (status >= 400 && status < 500) {
+    const code = status === 413 ? 'PAYLOAD_TOO_LARGE' : 'VALIDATION_ERROR'
+    response.status(status).json({ error: { code } })
+    return
+  }
   console.error('Request failed', error instanceof Error ? error.name : 'UnknownError')
   response.status(500).json({ error: { code: 'INTERNAL_ERROR' } })
 }

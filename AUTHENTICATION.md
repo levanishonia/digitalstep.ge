@@ -24,4 +24,4 @@ The build generates Prisma Client, checks both TypeScript projects, and builds V
 
 Sessions are seven-day, signed HS256 tokens kept only in an `httpOnly` cookie. The cookie is `Secure` in production, `SameSite=Lax`, and scoped to `/`. Same-origin deployment and `SameSite=Lax` reduce CSRF exposure; no permissive CORS is enabled. Login and registration have a basic per-process rate limiter. A shared/distributed limiter is a recommended follow-up if the service scales to multiple replicas.
 
-Passwords are hashed with bcryptjs at cost 12 for native-build-free Railway portability. API user projections explicitly omit `passwordHash`. Public validation accepts only `CUSTOMER` and `PROVIDER`; `ADMIN` cannot be registered publicly.
+Passwords are hashed with bcryptjs at cost 12 for native-build-free Railway portability. API user projections explicitly omit `passwordHash`. Public validation accepts only `CUSTOMER` and `PROVIDER`; `ADMIN` cannot be registered publicly. Registration also requires literal terms acceptance, and the database records the acceptance timestamp for auditability.

@@ -15,8 +15,9 @@ authRouter.post('/register', authLimiter, async (request, response, next) => {
   const parsed = registerSchema.safeParse(request.body)
   if (!parsed.success) return response.status(400).json({ error: { code: 'VALIDATION_ERROR' } })
   try {
-    const { password, ...profile } = parsed.data
-    const user = await prisma.user.create({ data: { ...profile, passwordHash: await bcrypt.hash(password, 12) }, select: safeUser })
+    const { password, termsAccepted: _, ...profile } = parsed.data
+    void _
+    const user = await prisma.user.create({ data: { ...profile, termsAcceptedAt: new Date(), passwordHash: await bcrypt.hash(password, 12) }, select: safeUser })
     setSessionCookie(response, await createSession(user.id))
     return response.status(201).json({ data: { user } })
   } catch (error) {

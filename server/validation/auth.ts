@@ -10,4 +10,5 @@ export const registerSchema = z.object({
   password: z.string().min(8).max(128),
   role: z.enum(['CUSTOMER', 'PROVIDER']),
   preferredLocale: z.enum(['ka', 'en']),
+  termsAccepted: z.literal(true),
 }).strict()
