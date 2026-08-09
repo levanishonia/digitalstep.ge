@@ -142,3 +142,119 @@ button { color: inherit; }
 /* Structured analysis tools */
 .analysis-tool{display:grid;gap:1rem;max-width:1400px;margin:auto}.analysis-tool>header h1{margin-bottom:.25rem}.analysis-context{padding:.75rem 1rem;border:1px solid var(--border,#dbe2ea);border-radius:12px;background:#f7fafc;color:#0f172a}.analysis-context a{color:#1d4ed8}.analysis-workspace{display:grid;grid-template-columns:minmax(280px,420px) minmax(0,1fr);gap:1rem;align-items:start}.analysis-workspace .studio-form{position:sticky;top:1rem}.analysis-workspace input,.analysis-workspace select,.analysis-workspace textarea{width:100%;min-height:44px}.budget-row{display:grid;grid-template-columns:1fr 90px;gap:.5rem}.channel-select{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.35rem}.channel-select label{display:flex;align-items:center;gap:.4rem;min-height:44px;overflow-wrap:anywhere}.channel-select input{width:auto;min-height:auto}.result-sections{display:grid;gap:1rem;min-width:0}.result-sections h2,.result-sections h3{overflow-wrap:anywhere}.channel-card,.priority article{border:1px solid var(--border,#dbe2ea);border-radius:10px;padding:.85rem;margin:.7rem 0}.channel-card progress{width:100%;display:block;margin:.5rem 0}.result-actions{display:flex;flex-wrap:wrap;gap:.6rem}.result-actions a,.priority a{display:inline-flex;align-items:center;min-height:44px;padding:.65rem 1rem;border-radius:9px;background:#172554;color:white;text-decoration:none}.history{display:flex;flex-wrap:wrap;gap:.5rem}.history h2{width:100%}.history button{min-height:44px;display:flex;gap:1rem;justify-content:space-between}.studio-form fieldset{border:0;padding:0;margin:0}.studio-form legend{font-weight:600;margin-bottom:.35rem}
 @media(max-width:800px){.analysis-workspace{grid-template-columns:1fr}.analysis-workspace .studio-form{position:static}.channel-select{grid-template-columns:1fr}.analysis-tool{padding-bottom:5rem}}
+
+/* Shared polish layer
+   Keeps legacy route styles aligned while the product transitions to shared primitives. */
+:root {
+  --border-strong: rgba(255,255,255,.14);
+  --control: #171f31;
+  --content-wide: 1320px;
+  --content-workspace: 1180px;
+  --radius-control: 10px;
+  --radius-card: 16px;
+}
+html[lang="ka"] body { line-height: 1.58; }
+html[lang="ka"] h1,html[lang="ka"] h2,html[lang="ka"] h3,
+html[lang="ka"] button,html[lang="ka"] .button { line-height: 1.45; }
+textarea,select { font: inherit; }
+button,a,input,textarea,select { touch-action: manipulation; }
+button:disabled,[aria-disabled="true"] { cursor: not-allowed; opacity: .58; }
+
+/* A consistent, accessible control language across Auth, Business and Studio. */
+:where(.auth-page,.studio-page,.business-page,.checkout-page,.analysis-tool,.confirm-dialog) :where(input,textarea,select) {
+  min-height: 44px; padding: 10px 12px; color: var(--text); background: var(--control);
+  border: 1px solid var(--border); border-radius: var(--radius-control); outline: 0;
+  transition: border-color .18s,box-shadow .18s,background .18s;
+}
+:where(.auth-page,.studio-page,.business-page,.checkout-page,.analysis-tool,.confirm-dialog) :where(input,textarea,select):hover:not(:disabled) { border-color: var(--border-strong); }
+:where(.auth-page,.studio-page,.business-page,.checkout-page,.analysis-tool,.confirm-dialog) :where(input,textarea,select):focus-visible {
+  border-color: #7780ff; box-shadow: 0 0 0 3px rgba(79,91,255,.18); outline: 0;
+}
+:where(input,textarea,select)[aria-invalid="true"] { border-color: var(--destructive)!important; }
+:where(.studio-button,.button,.auth-primary,.calendar-controls button,.idea-card button,.result-actions a,.priority a) {
+  min-height: 44px; border-radius: var(--radius-control); transition: border-color .18s,background .18s,transform .12s;
+}
+:where(.studio-button,.button,.auth-primary,.calendar-controls button,.idea-card button,.result-actions a,.priority a):active:not(:disabled) { transform: translateY(1px); }
+
+/* Shared page hierarchy and surfaces. */
+:where(.dashboard-page,.studio-page,.business-page,.analysis-tool)>header:first-child,
+.studio-heading { margin-bottom: 24px; }
+:where(.dashboard-page,.studio-page,.business-page,.analysis-tool)>header:first-child h1,
+.studio-heading h1 { max-width: 760px; margin-top: 6px; line-height: 1.22; letter-spacing: -.03em; }
+:where(.dashboard-page,.studio-page,.business-page,.analysis-tool)>header:first-child p { max-width: 720px; color: var(--muted); line-height: 1.65; }
+:where(.studio-panel,.detail-panel,.dashboard-card,.idea-card,.channel-card,.priority article) {
+  background: var(--card); border-color: var(--border); border-radius: var(--radius-card);
+}
+.studio-page,.analysis-tool { width: 100%; max-width: var(--content-workspace); }
+.service-grid,.category-grid { max-width: var(--content-wide); margin-inline: auto; }
+
+/* AI Assistant previously used a light, standalone palette. It now belongs to Studio. */
+.ai-chat { color: var(--text); background: var(--card); border-color: var(--border); }
+.ai-history { color: var(--text); background: var(--sidebar); border-color: var(--border); }
+.ai-history nav button { color: var(--muted); }
+.ai-history nav button:hover { color: var(--text); background: rgba(255,255,255,.04); }
+.ai-history nav button.active { color: var(--text); background: var(--elevated); border-color: rgba(79,91,255,.45); }
+.ai-history time,.ai-thinking { color: var(--muted); }
+.ai-conversation>header,.ai-composer { border-color: var(--border); }
+.ai-conversation header a { color: #aeb4ff; }
+.ai-usage { color: var(--muted); background: var(--elevated); }
+.ai-usage.exhausted { color: #ffd28a; background: rgba(255,181,71,.1); }
+.ai-messages article.user { background: var(--primary); }
+.ai-messages article.assistant { color: var(--text); background: var(--elevated); border: 1px solid var(--border); }
+.ai-welcome { color: var(--text); }
+.ai-welcome button,.ai-history button,.ai-composer button,.ai-error button { min-height: 44px; color: var(--text); background: var(--elevated); border: 1px solid var(--border); border-radius: var(--radius-control); }
+.ai-history header button,.ai-composer>button { background: var(--primary); border-color: transparent; }
+.ai-error { color: #ff9b94; }
+
+/* Analysis tools also shared a light prototype surface; normalize without changing output. */
+.analysis-context { color: var(--text); background: var(--elevated); border-color: var(--border); }
+.analysis-context a { color: #aeb4ff; }
+.analysis-workspace .studio-form,.result-sections>.studio-panel { min-width: 0; }
+.channel-card,.priority article { margin: 0; padding: 16px; }
+.priority article { border-color: rgba(79,91,255,.38); background: rgba(79,91,255,.07); }
+.result-actions a,.priority a { background: var(--primary); }
+
+/* Dialogs and calendar controls remain usable with long Georgian labels. */
+.confirm-dialog { width: min(520px,calc(100vw - 32px)); max-height: min(760px,calc(100dvh - 32px)); overflow-y: auto; color: var(--text); background: var(--card); border: 1px solid var(--border); }
+.confirm-dialog::backdrop { background: rgba(3,5,10,.78); backdrop-filter: blur(3px); }
+.confirm-dialog form { display: grid; gap: 12px; }
+.confirm-dialog label { display: grid; gap: 6px; color: #c8ced9; font-size: 12px; }
+.confirm-dialog>div,.confirm-dialog form>div { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.confirm-dialog button { min-height: 44px; padding: 0 14px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--elevated); }
+.confirm-dialog button:last-child { background: var(--primary); border-color: transparent; }
+.calendar-toolbar strong { text-transform: capitalize; }
+.calendar-controls { flex-wrap: wrap; }
+.calendar-controls button { white-space: nowrap; }
+.calendar-event { color: var(--text); }
+
+@media (max-width:900px) {
+  .main-content,.dashboard-content { padding-bottom: calc(104px + env(safe-area-inset-bottom)); }
+  .studio-page,.analysis-tool { max-width: 100%; }
+  .studio-heading { align-items: flex-start; }
+  .studio-heading .studio-button { flex: none; }
+}
+@media (max-width:600px) {
+  .main-content { padding-inline: 16px; }
+  :where(.dashboard-page,.studio-page,.business-page,.analysis-tool)>header:first-child,
+  .studio-heading { margin-bottom: 18px; }
+  .studio-heading { flex-direction: column; }
+  .studio-heading .studio-button { width: 100%; justify-content: center; white-space: normal; text-align: center; }
+  .studio-panel,.detail-panel { padding: 16px; }
+  .studio-tools { grid-template-columns: 1fr; }
+  .studio-tools>a,.studio-tools>article { min-height: 96px; }
+  .calendar-toolbar { display: grid; grid-template-columns: 1fr; }
+  .calendar-toolbar>strong { grid-row: 1; }
+  .calendar-filters { margin-inline: -16px; padding-inline: 16px; scrollbar-width: none; }
+  .calendar-filters select { flex: 0 0 auto; max-width: 75vw; }
+  .confirm-dialog>div button,.confirm-dialog form>div button { flex: 1 1 auto; }
+  .ai-chat { height: calc(100dvh - 242px); min-height: 420px; }
+  .ai-messages article { max-width: 92%; line-height: 1.6; }
+  .ai-composer { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+}
+@media (max-width:430px) {
+  .service-grid { grid-template-columns: 1fr; }
+  .service-card { max-width: 100%; }
+  .service-title { min-height: 0; }
+  .hero-actions { flex-direction: column; }
+  .hero-actions .button { width: 100%; }
+}
