@@ -8,6 +8,8 @@ import { providerOrdersRouter } from './routes/providerOrders.js'
 import { businessProfileRouter } from './routes/businessProfile.js'
 import { studioAssistantRouter } from './routes/studioAssistant.js'
 import { postGeneratorRouter } from './routes/postGenerator.js'
+import {contentIdeasRouter} from './routes/contentIdeas.js'
+import {contentItemsRouter} from './routes/contentItems.js'
 import { logPrismaError } from './lib/logPrismaError.js'
 
 export const app = express()
@@ -25,6 +27,8 @@ app.use('/api/provider/orders', providerOrdersRouter)
 app.use('/api/business-profile', businessProfileRouter)
 app.use('/api/studio', studioAssistantRouter)
 app.use('/api/studio/post-generator', postGeneratorRouter)
+app.use('/api/studio/content-ideas',contentIdeasRouter)
+app.use('/api/content-items',contentItemsRouter)
 app.use('/api', (_request, response) => response.status(404).json({ error: { code: 'NOT_FOUND' } }))
 
 // Both development and the compiled server are started from the repository root.
