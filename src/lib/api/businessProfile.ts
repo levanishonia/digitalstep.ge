@@ -1,0 +1,4 @@
+import type { BusinessProfile,BusinessProfileInput } from '../../../shared/businessProfile'
+export class BusinessProfileApiError extends Error{constructor(public code:string,public status:number){super(code)}}
+async function request(method:string,body?:unknown){const response=await fetch('/api/business-profile',{method,credentials:'include',headers:body?{'Content-Type':'application/json'}:undefined,body:body?JSON.stringify(body):undefined});const json=await response.json().catch(()=>({}));if(!response.ok)throw new BusinessProfileApiError(json?.error?.code??'INTERNAL_ERROR',response.status);return json.data as {businessProfile:BusinessProfile|null}}
+export const businessProfileApi={get:()=>request('GET'),create:(profile:BusinessProfileInput)=>request('POST',profile),update:(profile:Partial<BusinessProfileInput>)=>request('PATCH',profile)}
