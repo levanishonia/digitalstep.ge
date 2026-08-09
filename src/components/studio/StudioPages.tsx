@@ -1,3 +1,4 @@
+import type {ReactNode} from 'react'
 import { BarChart3,CalendarDays,FileText,Lightbulb,LockKeyhole,Megaphone,MessageSquareText,Palette,Sparkles,Target } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { canUseFeature,getUsageLimit,type StudioFeature } from '../../domain/subscriptions'
