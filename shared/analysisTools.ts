@@ -1,0 +1,11 @@
+export const marketingGoals=['INCREASE_SALES','ACQUIRE_CUSTOMERS','BRAND_AWARENESS','SOCIAL_MEDIA_GROWTH','LEAD_GENERATION','PROMOTE_PRODUCT','LAUNCH_PRODUCT','RETAIN_CUSTOMERS'] as const
+export const marketingChannels=['META','INSTAGRAM','FACEBOOK','TIKTOK','GOOGLE_ADS','SEO','EMAIL','LINKEDIN','CONTENT','INFLUENCERS','OTHER'] as const
+export const marketingTimeframes=['7_DAYS','30_DAYS','90_DAYS','CUSTOM'] as const
+export const analysisFocusAreas=['FULL_ANALYSIS','MARKETING','POSITIONING','CUSTOMER_ACQUISITION','CONTENT','DIGITAL_PRESENCE','SALES','AUTOMATION'] as const
+export const actionTypes=['NONE','CONTENT','POST','PLANNING','CALENDAR','MARKETPLACE_SERVICE'] as const
+export type MarketingPlanInput={goal:typeof marketingGoals[number];budgetAmount?:number;currency?:string;timeframe:typeof marketingTimeframes[number];customStart?:string;customEnd?:string;selectedChannels?:typeof marketingChannels[number][];priorityProductOrService?:string;campaignContext?:string;customInstructions?:string;language?:'KA'|'EN'}
+export type MarketingPlanOutput={summary:string;primaryGoal:string;strategy:string;audienceFocus:string;channelPlan:{channel:string;purpose:string;budgetPercent:number|null;budgetAmount:number|null;actions:string[]}[];contentPlan:{contentType:string;frequency:string;purpose:string}[];timeline:{period:string;actions:string[]}[];kpis:{name:string;reason:string}[];nextActions:string[];risks:string[]}
+export type BusinessAnalysisInput={focusArea:typeof analysisFocusAreas[number];currentChallenge?:string;additionalContext?:string;language?:'KA'|'EN'}
+export type BusinessAnalysisOutput={executiveSummary:string;strengths:Insight[];weaknesses:Insight[];opportunities:Insight[];risks:Insight[];priorityActions:{title:string;impact:'LOW'|'MEDIUM'|'HIGH';effort:'LOW'|'MEDIUM'|'HIGH';reason:string;nextStep:string;actionType:typeof actionTypes[number];marketplaceCategory:string|null}[];marketingRecommendations:string[];contentRecommendations:string[];automationOpportunities:string[];missingInformation:string[]}
+export type Insight={title:string;explanation:string}
+export type GenerationRecord<I,O>={id:string;createdAt:string;input:I;output:O}
