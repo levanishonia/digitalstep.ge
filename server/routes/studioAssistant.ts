@@ -29,11 +29,17 @@ async function usage(userId: string, plan: SubscriptionPlan) {
 }
 async function reserve(userId: string, limit: number) {
   const period = periodKey()
-  await prisma.aIUsage.upsert({ where: { userId_feature_periodKey: { userId, feature: 'AI_ASSISTANT', periodKey: period } }, create: { userId, feature: 'AI_ASSISTANT', periodKey: period }, update: {} })
-  const changed = await prisma.$executeRaw`UPDATE "AIUsage" SET "reservedCount" = "reservedCount" + 1, "updatedAt" = NOW() WHERE "userId" = ${userId} AND "feature" = 'AI_ASSISTANT'::"AIFeature" AND "periodKey" = ${period} AND "requestCount" + "reservedCount" < ${limit}`
-  return changed === 1
+  return prisma.$transaction(async tx => {
+    const lockKey = `${userId}:AI_ASSISTANT:${period}`
+    await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`
+    await tx.aIUsageReservation.deleteMany({ where: { expiresAt: { lte: new Date() } } })
+    const usageRow = await tx.aIUsage.upsert({ where: { userId_feature_periodKey: { userId, feature: 'AI_ASSISTANT', periodKey: period } }, create: { userId, feature: 'AI_ASSISTANT', periodKey: period }, update: {} })
+    const activeReservations = await tx.aIUsageReservation.count({ where: { userId, feature: 'AI_ASSISTANT', periodKey: period, expiresAt: { gt: new Date() } } })
+    if (usageRow.requestCount + activeReservations >= limit) return null
+    return tx.aIUsageReservation.create({ data: { userId, feature: 'AI_ASSISTANT', periodKey: period, expiresAt: new Date(Date.now() + aiConfig.reservationLeaseMs) }, select: { id: true, periodKey: true } })
+  })
 }
-const release = (userId: string, success: boolean) => prisma.aIUsage.update({ where: { userId_feature_periodKey: { userId, feature: 'AI_ASSISTANT', periodKey: periodKey() } }, data: { reservedCount: { decrement: 1 }, ...(success ? { requestCount: { increment: 1 } } : {}) } })
+const release = (reservationId: string, userId: string) => prisma.aIUsageReservation.deleteMany({ where: { id: reservationId, userId } })
 
 studioAssistantRouter.get('/usage', async (req, res) => {
   const access = await userAccess(req.auth!.userId)
@@ -67,7 +73,8 @@ studioAssistantRouter.post('/assistant/chat', limiter, async (req, res) => {
   if (parsed.data.retryMessageId && !userMessage) return res.status(400).json({ error: { code: 'INVALID_MESSAGE' } })
   if (!userMessage) userMessage = await prisma.aIMessage.create({ data: { conversationId: conversation.id, role: 'USER', content: parsed.data.message } })
   const limit = getUsageLimit(access.subscriptionPlan, 'AI_REQUESTS')
-  if (!await reserve(userId, limit)) return res.status(429).json({ error: { code: 'AI_USAGE_LIMIT_REACHED', retryMessageId: userMessage.id, conversationId: conversation.id } })
+  const reservation = await reserve(userId, limit)
+  if (!reservation) return res.status(429).json({ error: { code: 'AI_USAGE_LIMIT_REACHED', retryMessageId: userMessage.id, conversationId: conversation.id } })
   try {
     const history = await prisma.aIMessage.findMany({ where: { conversationId: conversation.id }, orderBy: { createdAt: 'desc' }, take: aiConfig.historyMessageLimit })
     const profile = access.businessProfile as unknown as BusinessProfile | null
@@ -75,12 +82,14 @@ studioAssistantRouter.post('/assistant/chat', limiter, async (req, res) => {
     const assistantMessage = await prisma.$transaction(async tx => {
       const created = await tx.aIMessage.create({ data: { conversationId: conversation!.id, role: 'ASSISTANT', content: result.content } })
       await tx.aIConversation.update({ where: { id: conversation!.id }, data: { updatedAt: new Date() } })
-      await tx.aIUsage.update({ where: { userId_feature_periodKey: { userId, feature: 'AI_ASSISTANT', periodKey: periodKey() } }, data: { reservedCount: { decrement: 1 }, requestCount: { increment: 1 } } })
+      const consumed = await tx.aIUsageReservation.deleteMany({ where: { id: reservation.id, userId, periodKey: reservation.periodKey } })
+      if (consumed.count !== 1) throw new Error('AI usage reservation expired')
+      await tx.aIUsage.update({ where: { userId_feature_periodKey: { userId, feature: 'AI_ASSISTANT', periodKey: reservation.periodKey } }, data: { requestCount: { increment: 1 } } })
       return created
     })
     return res.json({ data: { conversation: { id: conversation.id, title: conversation.title }, userMessage, assistantMessage, usage: await usage(userId, access.subscriptionPlan) } })
   } catch (error) {
-    await release(userId, false).catch(() => undefined)
+    await release(reservation.id, userId).catch(() => undefined)
     const code = error instanceof AIProviderError ? error.kind === 'NOT_CONFIGURED' ? 'AI_NOT_CONFIGURED' : error.kind === 'RATE_LIMITED' ? 'RATE_LIMITED' : 'AI_PROVIDER_ERROR' : 'INTERNAL_ERROR'
     console.error('AI assistant generation failed', error instanceof AIProviderError ? error.kind : 'UnknownError')
     return res.status(code === 'RATE_LIMITED' ? 429 : code === 'AI_NOT_CONFIGURED' ? 503 : 502).json({ error: { code, retryMessageId: userMessage.id, conversationId: conversation.id } })

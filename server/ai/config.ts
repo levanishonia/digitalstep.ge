@@ -4,6 +4,7 @@ export const aiConfig = {
   historyMessageLimit: 20,
   maxOutputTokens: 1200,
   timeoutMs: 30_000,
+  reservationLeaseMs: 60_000,
 } as const
 
 export const aiIsConfigured = () => Boolean(process.env.OPENAI_API_KEY?.trim())

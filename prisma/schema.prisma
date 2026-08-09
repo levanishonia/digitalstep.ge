@@ -55,25 +55,26 @@ enum BrandTone {
 }
 
 model User {
-  id               String           @id @default(cuid())
-  email            String           @unique
+  id               String               @id @default(cuid())
+  email            String               @unique
   passwordHash     String
   firstName        String
   lastName         String
   phone            String?
-  role             UserRole         @default(CUSTOMER)
-  preferredLocale  String           @default("ka")
+  role             UserRole             @default(CUSTOMER)
+  preferredLocale  String               @default("ka")
   termsAcceptedAt  DateTime
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  orders           Order[]          @relation("CustomerOrders")
-  providerSlug     String?          @unique
-  assignedOrders   Order[]          @relation("ProviderOrders")
-  providerStatus   ProviderStatus   @default(PENDING)
-  subscriptionPlan SubscriptionPlan @default(FREE)
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  orders           Order[]              @relation("CustomerOrders")
+  providerSlug     String?              @unique
+  assignedOrders   Order[]              @relation("ProviderOrders")
+  providerStatus   ProviderStatus       @default(PENDING)
+  subscriptionPlan SubscriptionPlan     @default(FREE)
   businessProfile  BusinessProfile?
   aiConversations  AIConversation[]
   aiUsage          AIUsage[]
+  aiReservations   AIUsageReservation[]
 }
 
 enum AIMessageRole {
@@ -109,17 +110,29 @@ model AIMessage {
 }
 
 model AIUsage {
-  id            String    @id @default(cuid())
-  userId        String
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  feature       AIFeature
-  periodKey     String
-  requestCount  Int       @default(0)
-  reservedCount Int       @default(0)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  feature      AIFeature
+  periodKey    String
+  requestCount Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@unique([userId, feature, periodKey])
+}
+
+model AIUsageReservation {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  feature   AIFeature
+  periodKey String
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  @@index([userId, feature, periodKey, expiresAt])
+  @@index([expiresAt])
 }
 
 model BusinessProfile {
