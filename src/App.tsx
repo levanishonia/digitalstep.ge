@@ -11,6 +11,8 @@ import { RequireAuth } from './auth/RequireAuth'
 import { RequireRole } from './auth/RequireRole'
 import { ProviderLayout } from './components/provider/ProviderLayout'
 import { ProviderDashboard, ProviderOrderDetail, ProviderOrders, ProviderProfile } from './components/provider/ProviderPages'
+import { AssistantPage, BusinessAnalysisPage, ContentCalendarPage, ContentIdeasPage, MarketingPlannerPage, PostGeneratorPage, StudioHome, StudioLayout } from './components/studio/StudioPages'
+import { BusinessPage, PricingPage } from './components/studio/BusinessAndPricing'
 
 export function App() {
   const locale = resolveLocale(window.location.pathname)
@@ -26,5 +28,11 @@ export function App() {
     const page=segments[1]==='orders'&&segments[2]?<OrderDetailPage locale={locale} id={segments[2]}/>:segments[1]==='orders'?<OrdersPage locale={locale}/>:segments[1]==='profile'?<ProfilePage locale={locale}/>:segments[1]==='settings'?<SettingsPage locale={locale}/>:segments[1]==='messages'?<MessagesPage locale={locale} conversationId={segments[2]}/>:segments[1]==='favorites'?<FavoritesPlaceholder locale={locale}/>:<DashboardOverview locale={locale}/>
     return <RequireAuth locale={locale}><DashboardLayout locale={locale}>{page}</DashboardLayout></RequireAuth>
   }
+  if(segments[0]==='studio'){
+    const page=segments[1]==='assistant'?<AssistantPage locale={locale}/>:segments[1]==='post-generator'?<PostGeneratorPage locale={locale}/>:segments[1]==='content-calendar'?<ContentCalendarPage locale={locale}/>:segments[1]==='content-ideas'?<ContentIdeasPage locale={locale}/>:segments[1]==='marketing-planner'?<MarketingPlannerPage locale={locale}/>:segments[1]==='business-analysis'?<BusinessAnalysisPage locale={locale}/>:<StudioHome locale={locale}/>
+    return <RequireAuth locale={locale}><DashboardLayout locale={locale}><StudioLayout locale={locale}>{page}</StudioLayout></DashboardLayout></RequireAuth>
+  }
+  if(segments[0]==='business')return <RequireAuth locale={locale}><DashboardLayout locale={locale}><BusinessPage locale={locale}/></DashboardLayout></RequireAuth>
+  if(segments[0]==='pricing')return <RequireAuth locale={locale}><DashboardLayout locale={locale}><PricingPage locale={locale}/></DashboardLayout></RequireAuth>
   return <MarketplaceShell locale={locale} />
 }

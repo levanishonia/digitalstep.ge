@@ -1,11 +1,11 @@
-import { Bell, Heart, LayoutDashboard, ListOrdered, LogOut, MessageCircle, Settings, UserRound } from 'lucide-react'
+import { Bell, BriefcaseBusiness, Heart, LayoutDashboard, ListOrdered, LogOut, MessageCircle, Settings, Sparkles, UserRound } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Logo } from '../Logo'
 import { localePath, type Locale } from '../../i18n'
 import { useAuth } from '../../auth/AuthContext'
 
-const copy={ka:{overview:'მიმოხილვა',orders:'ჩემი შეკვეთები',favorites:'რჩეულები',messages:'შეტყობინებები',profile:'პროფილი',settings:'პარამეტრები',back:'მარკეტპლეისზე დაბრუნება',nav:'მომხმარებლის სივრცე',language:'English',roles:{CUSTOMER:'მომხმარებელი',PROVIDER:'მომსახურების მიმწოდებელი',ADMIN:'ადმინისტრატორი'},signOut:'გასვლა',signingOut:'ანგარიშიდან გასვლა...'},en:{overview:'Overview',orders:'My Orders',favorites:'Favorites',messages:'Messages',profile:'Profile',settings:'Settings',back:'Back to Marketplace',nav:'Customer dashboard',language:'ქართული',roles:{CUSTOMER:'Customer',PROVIDER:'Service Provider',ADMIN:'Administrator'},signOut:'Sign Out',signingOut:'Signing out...'}} as const
-const dashboardNavigation=[['overview','/dashboard',LayoutDashboard],['orders','/dashboard/orders',ListOrdered],['favorites','/dashboard/favorites',Heart],['messages','/dashboard/messages',MessageCircle],['profile','/dashboard/profile',UserRound],['settings','/dashboard/settings',Settings]] as const
+const copy={ka:{studio:'Studio',business:'ჩემი ბიზნესი',overview:'მიმოხილვა',orders:'ჩემი შეკვეთები',favorites:'რჩეულები',messages:'შეტყობინებები',profile:'პროფილი',settings:'პარამეტრები',back:'მარკეტპლეისზე დაბრუნება',nav:'მომხმარებლის სივრცე',language:'English',roles:{CUSTOMER:'მომხმარებელი',PROVIDER:'მომსახურების მიმწოდებელი',ADMIN:'ადმინისტრატორი'},signOut:'გასვლა',signingOut:'ანგარიშიდან გასვლა...'},en:{studio:'Studio',business:'My Business',overview:'Overview',orders:'My Orders',favorites:'Favorites',messages:'Messages',profile:'Profile',settings:'Settings',back:'Back to Marketplace',nav:'Customer dashboard',language:'ქართული',roles:{CUSTOMER:'Customer',PROVIDER:'Service Provider',ADMIN:'Administrator'},signOut:'Sign Out',signingOut:'Signing out...'}} as const
+const dashboardNavigation=[['overview','/dashboard',LayoutDashboard],['studio','/studio',Sparkles],['business','/business',BriefcaseBusiness],['orders','/dashboard/orders',ListOrdered],['favorites','/dashboard/favorites',Heart],['messages','/dashboard/messages',MessageCircle],['profile','/dashboard/profile',UserRound],['settings','/dashboard/settings',Settings]] as const
 const mobileKeys=new Set(['overview','orders','profile','settings'])
 
 export function DashboardLayout({locale,children}:{locale:Locale;children:ReactNode}) {
