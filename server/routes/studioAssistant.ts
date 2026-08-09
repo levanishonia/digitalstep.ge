@@ -9,6 +9,7 @@ import { AIService } from '../ai/service.js'
 import { openAIProvider } from '../ai/openAIProvider.js'
 import { buildBusinessContext, type BusinessProfile } from '../../shared/businessProfile.js'
 import { canUseFeature, getUsageLimit, type SubscriptionPlan } from '../../src/domain/subscriptions.js'
+import { logPrismaError } from '../lib/logPrismaError.js'
 
 export const studioAssistantRouter = Router()
 studioAssistantRouter.use(requireAuth)
@@ -31,7 +32,10 @@ async function reserve(userId: string, limit: number) {
   const period = periodKey()
   return prisma.$transaction(async tx => {
     const lockKey = `${userId}:AI_ASSISTANT:${period}`
-    await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`
+    // This function returns PostgreSQL's `void` type, which Prisma cannot
+    // deserialize through $queryRaw. $executeRaw acquires the same
+    // transaction-scoped lock without attempting to decode its result row.
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`
     await tx.aIUsageReservation.deleteMany({ where: { expiresAt: { lte: new Date() } } })
     const usageRow = await tx.aIUsage.upsert({ where: { userId_feature_periodKey: { userId, feature: 'AI_ASSISTANT', periodKey: period } }, create: { userId, feature: 'AI_ASSISTANT', periodKey: period }, update: {} })
     const activeReservations = await tx.aIUsageReservation.count({ where: { userId, feature: 'AI_ASSISTANT', periodKey: period, expiresAt: { gt: new Date() } } })
@@ -91,7 +95,9 @@ studioAssistantRouter.post('/assistant/chat', limiter, async (req, res) => {
   } catch (error) {
     await release(reservation.id, userId).catch(() => undefined)
     const code = error instanceof AIProviderError ? error.kind === 'NOT_CONFIGURED' ? 'AI_NOT_CONFIGURED' : error.kind === 'RATE_LIMITED' ? 'RATE_LIMITED' : 'AI_PROVIDER_ERROR' : 'INTERNAL_ERROR'
-    console.error('AI assistant generation failed', error instanceof AIProviderError ? error.kind : 'UnknownError')
+    if (!logPrismaError(error, req, 'POST /api/studio/assistant/chat: generate response and consume usage reservation')) {
+      console.error('AI assistant generation failed', error instanceof AIProviderError ? error.kind : 'UnknownError')
+    }
     return res.status(code === 'RATE_LIMITED' ? 429 : code === 'AI_NOT_CONFIGURED' ? 503 : 502).json({ error: { code, retryMessageId: userMessage.id, conversationId: conversation.id } })
   }
 })
