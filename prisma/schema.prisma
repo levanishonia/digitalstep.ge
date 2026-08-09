@@ -25,4 +25,50 @@ model User {
   termsAcceptedAt DateTime
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  orders          Order[]
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  IN_REVIEW
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  NOT_REQUIRED
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model Order {
+  id               String        @id @default(cuid())
+  orderNumber      String        @unique
+  customerId       String
+  customer         User          @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  serviceId        String
+  serviceSlug      String
+  serviceTitleKa   String
+  serviceTitleEn   String
+  providerSlug     String
+  providerName     String
+  packageId        String
+  packageNameKa    String
+  packageNameEn    String
+  priceMinor       Int
+  currency         String        @default("GEL")
+  status           OrderStatus   @default(PENDING)
+  paymentStatus    PaymentStatus @default(PENDING)
+  requirementsText String
+  referenceLinks   Json?
+  deliveryDate     DateTime
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([customerId, createdAt])
+  @@index([customerId, status])
 }
