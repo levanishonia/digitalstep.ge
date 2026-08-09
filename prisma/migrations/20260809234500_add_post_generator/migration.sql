@@ -1,0 +1,10 @@
+ALTER TYPE "AIFeature" ADD VALUE 'POST_GENERATOR';
+CREATE TYPE "ContentStatus" AS ENUM ('IDEA','DRAFT','READY','SCHEDULED','PUBLISHED');
+CREATE TYPE "ContentSource" AS ENUM ('MANUAL','AI_POST_GENERATOR');
+CREATE TABLE "AIGeneration" ("id" TEXT NOT NULL,"userId" TEXT NOT NULL,"businessProfileId" TEXT,"feature" "AIFeature" NOT NULL,"inputJson" JSONB NOT NULL,"outputJson" JSONB NOT NULL,"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT "AIGeneration_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "ContentItem" ("id" TEXT NOT NULL,"userId" TEXT NOT NULL,"businessProfileId" TEXT,"title" TEXT NOT NULL,"caption" TEXT NOT NULL,"platform" "SocialPlatform" NOT NULL,"contentType" TEXT NOT NULL DEFAULT 'POST',"status" "ContentStatus" NOT NULL DEFAULT 'IDEA',"scheduledAt" TIMESTAMP(3),"source" "ContentSource" NOT NULL DEFAULT 'MANUAL',"sourceGenerationId" TEXT,"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,"updatedAt" TIMESTAMP(3) NOT NULL,CONSTRAINT "ContentItem_pkey" PRIMARY KEY ("id"));
+CREATE INDEX "AIGeneration_userId_feature_createdAt_idx" ON "AIGeneration"("userId","feature","createdAt");
+CREATE INDEX "ContentItem_userId_scheduledAt_idx" ON "ContentItem"("userId","scheduledAt");
+ALTER TABLE "AIGeneration" ADD CONSTRAINT "AIGeneration_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ContentItem" ADD CONSTRAINT "ContentItem_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ContentItem" ADD CONSTRAINT "ContentItem_sourceGenerationId_fkey" FOREIGN KEY ("sourceGenerationId") REFERENCES "AIGeneration"("id") ON DELETE SET NULL ON UPDATE CASCADE;
