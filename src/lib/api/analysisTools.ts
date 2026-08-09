@@ -1,0 +1,8 @@
+import type {BusinessAnalysisInput,BusinessAnalysisOutput,GenerationRecord,MarketingPlanInput,MarketingPlanOutput} from '../../../shared/analysisTools'
+async function request<T>(url:string,init?:RequestInit):Promise<T>{const response=await fetch(url,{...init,headers:{'Content-Type':'application/json',...init?.headers},credentials:'include'}),body=await response.json();if(!response.ok)throw new Error(body.error?.code||'INTERNAL_ERROR');return body.data}
+export const generateMarketingPlan=(input:MarketingPlanInput)=>request<{generation:GenerationRecord<MarketingPlanInput,MarketingPlanOutput>}>('/api/studio/marketing-planner/generate',{method:'POST',body:JSON.stringify(input)})
+export const getMarketingPlanHistory=()=>request<{items:{id:string;createdAt:string;input:MarketingPlanInput}[]}>('/api/studio/marketing-planner/history')
+export const getMarketingPlan=(id:string)=>request<{generation:GenerationRecord<MarketingPlanInput,MarketingPlanOutput>}>(`/api/studio/marketing-planner/history/${encodeURIComponent(id)}`)
+export const generateBusinessAnalysis=(input:BusinessAnalysisInput)=>request<{generation:GenerationRecord<BusinessAnalysisInput,BusinessAnalysisOutput>}>('/api/studio/business-analysis/generate',{method:'POST',body:JSON.stringify(input)})
+export const getBusinessAnalysisHistory=()=>request<{items:{id:string;createdAt:string;input:BusinessAnalysisInput}[]}>('/api/studio/business-analysis/history')
+export const getBusinessAnalysis=(id:string)=>request<{generation:GenerationRecord<BusinessAnalysisInput,BusinessAnalysisOutput>}>(`/api/studio/business-analysis/history/${encodeURIComponent(id)}`)
