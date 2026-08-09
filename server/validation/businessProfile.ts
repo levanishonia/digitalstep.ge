@@ -1,0 +1,6 @@
+import { z } from 'zod'
+import { brandTones,businessGoals,contentLanguages,socialPlatforms } from '../../shared/businessProfile.js'
+const optionalText=(max:number)=>z.string().trim().max(max).nullable().optional().transform(v=>v||null)
+const fields={name:z.string().trim().min(1).max(120),industry:z.string().trim().min(1).max(120),description:optionalText(2000),website:z.union([z.url().max(500),z.literal(''),z.null()]).optional().transform(v=>v||null),locationMarket:optionalText(300),productsServices:optionalText(2000),primaryOffer:optionalText(1000),targetAudience:optionalText(1500),audienceLocation:optionalText(500),customerProblem:optionalText(1500),goals:z.array(z.enum(businessGoals)).max(7),brandTone:z.enum(brandTones).nullable().optional(),brandToneNotes:optionalText(1000),preferredContentLanguage:z.enum(contentLanguages),brandValues:optionalText(1000),socialPlatforms:z.array(z.enum(socialPlatforms)).max(7),competitors:z.array(z.object({name:z.string().trim().min(1).max(120),url:z.url().max(500).optional()})).max(5).optional().default([])}
+export const createBusinessProfileSchema=z.strictObject(fields)
+export const updateBusinessProfileSchema=z.strictObject(Object.fromEntries(Object.entries(fields).map(([key,value])=>[key,value.optional()])) as {[K in keyof typeof fields]:z.ZodOptional<(typeof fields)[K]>}).refine(value=>Object.keys(value).length>0)

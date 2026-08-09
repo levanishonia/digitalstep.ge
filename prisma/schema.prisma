@@ -25,23 +25,78 @@ enum SubscriptionPlan {
   BUSINESS
 }
 
+enum BusinessGoal {
+  INCREASE_SALES
+  ACQUIRE_CUSTOMERS
+  BRAND_AWARENESS
+  SOCIAL_MEDIA_GROWTH
+  ONLINE_SALES
+  LAUNCH_PRODUCT
+  AUTOMATE_PROCESSES
+}
+
+enum SocialPlatform {
+  FACEBOOK
+  INSTAGRAM
+  TIKTOK
+  LINKEDIN
+  YOUTUBE
+  GOOGLE
+  OTHER
+}
+
+enum BrandTone {
+  PROFESSIONAL
+  FRIENDLY
+  PREMIUM
+  PLAYFUL
+  DIRECT
+  EDUCATIONAL
+}
+
 model User {
-  id              String   @id @default(cuid())
-  email           String   @unique
-  passwordHash    String
-  firstName       String
-  lastName        String
-  phone           String?
-  role            UserRole @default(CUSTOMER)
-  preferredLocale String   @default("ka")
-  termsAcceptedAt DateTime
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  orders          Order[]  @relation("CustomerOrders")
-  providerSlug    String?  @unique
-  assignedOrders  Order[]  @relation("ProviderOrders")
-  providerStatus  ProviderStatus @default(PENDING)
+  id               String           @id @default(cuid())
+  email            String           @unique
+  passwordHash     String
+  firstName        String
+  lastName         String
+  phone            String?
+  role             UserRole         @default(CUSTOMER)
+  preferredLocale  String           @default("ka")
+  termsAcceptedAt  DateTime
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  orders           Order[]          @relation("CustomerOrders")
+  providerSlug     String?          @unique
+  assignedOrders   Order[]          @relation("ProviderOrders")
+  providerStatus   ProviderStatus   @default(PENDING)
   subscriptionPlan SubscriptionPlan @default(FREE)
+  businessProfile  BusinessProfile?
+}
+
+model BusinessProfile {
+  id                       String           @id @default(cuid())
+  userId                   String           @unique
+  user                     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                     String
+  industry                 String
+  description              String?
+  website                  String?
+  locationMarket           String?
+  productsServices         String?
+  primaryOffer             String?
+  targetAudience           String?
+  audienceLocation         String?
+  customerProblem          String?
+  goals                    BusinessGoal[]
+  brandTone                BrandTone?
+  brandToneNotes           String?
+  preferredContentLanguage String           @default("ka")
+  brandValues              String?
+  socialPlatforms          SocialPlatform[]
+  competitors              Json?
+  createdAt                DateTime         @default(now())
+  updatedAt                DateTime         @updatedAt
 }
 
 enum OrderStatus {
