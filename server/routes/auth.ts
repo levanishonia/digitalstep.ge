@@ -9,7 +9,7 @@ import { loginSchema, registerSchema } from '../validation/auth.js'
 
 export const authRouter = Router()
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: 'draft-8', legacyHeaders: false, message: { error: { code: 'RATE_LIMITED' } } })
-const safeUser = { id: true, firstName: true, lastName: true, email: true, phone: true, role: true, preferredLocale: true, providerSlug: true } as const
+const safeUser = { id: true, firstName: true, lastName: true, email: true, phone: true, role: true, preferredLocale: true, providerSlug: true, providerStatus: true, subscriptionPlan: true } as const
 
 authRouter.post('/register', authLimiter, async (request, response, next) => {
   const parsed = registerSchema.safeParse(request.body)

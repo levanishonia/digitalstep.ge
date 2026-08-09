@@ -13,6 +13,18 @@ enum UserRole {
   ADMIN
 }
 
+enum ProviderStatus {
+  PENDING
+  VERIFIED
+  SUSPENDED
+}
+
+enum SubscriptionPlan {
+  FREE
+  PRO
+  BUSINESS
+}
+
 model User {
   id              String   @id @default(cuid())
   email           String   @unique
@@ -28,6 +40,8 @@ model User {
   orders          Order[]  @relation("CustomerOrders")
   providerSlug    String?  @unique
   assignedOrders  Order[]  @relation("ProviderOrders")
+  providerStatus  ProviderStatus @default(PENDING)
+  subscriptionPlan SubscriptionPlan @default(FREE)
 }
 
 enum OrderStatus {
