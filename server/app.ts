@@ -7,6 +7,7 @@ import { ordersRouter } from './routes/orders.js'
 import { providerOrdersRouter } from './routes/providerOrders.js'
 import { businessProfileRouter } from './routes/businessProfile.js'
 import { studioAssistantRouter } from './routes/studioAssistant.js'
+import { logPrismaError } from './lib/logPrismaError.js'
 
 export const app = express()
 app.disable('x-powered-by')
@@ -31,7 +32,7 @@ const root = path.resolve(process.cwd())
 app.use(express.static(path.join(root, 'dist')))
 app.use((_request, response) => response.sendFile(path.join(root, 'dist', 'index.html')))
 
-const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => {
+const errorHandler: ErrorRequestHandler = (error, request, response, _next) => {
   void _next
   const reportedStatus = typeof error === 'object' && error !== null
     ? Number('status' in error ? error.status : 'statusCode' in error ? error.statusCode : 500)
@@ -42,7 +43,15 @@ const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => 
     response.status(status).json({ error: { code } })
     return
   }
-  console.error('Request failed', error instanceof Error ? error.name : 'UnknownError')
+  if (!logPrismaError(error, request)) {
+    console.error('Request failed', {
+      method: request.method,
+      path: `${request.baseUrl}${request.path}`,
+      name: error instanceof Error ? error.name : 'UnknownError',
+      message: error instanceof Error ? error.message : 'Unknown server error',
+      stack: error instanceof Error ? error.stack : undefined,
+    })
+  }
   response.status(500).json({ error: { code: 'INTERNAL_ERROR' } })
 }
 app.use(errorHandler)
