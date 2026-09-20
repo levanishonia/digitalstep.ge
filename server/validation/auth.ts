@@ -16,6 +16,6 @@ export const registerSchema = z.object({
 export const updateProfileSchema = z.object({
   firstName: z.string().trim().min(1).max(80).optional(),
   lastName: z.string().trim().min(1).max(80).optional(),
-  phone: z.string().trim().max(30).nullable().optional().transform(value => value || null),
+  phone: z.string().trim().max(30).nullable().transform(value => value === '' ? null : value).optional(),
   preferredLocale: z.enum(['ka', 'en']).optional(),
 }).strict().refine(value => Object.keys(value).length > 0)
