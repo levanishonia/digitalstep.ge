@@ -17,5 +17,6 @@ export const authApi={
   login:(input:{email:string;password:string})=>request<{user:AuthUser}>('/api/auth/login',{method:'POST',body:JSON.stringify(input)}),
   register:(input:{firstName:string;lastName:string;email:string;phone?:string;password:string;role:'CUSTOMER'|'PROVIDER';preferredLocale:Locale;termsAccepted:true})=>request<{user:AuthUser}>('/api/auth/register',{method:'POST',body:JSON.stringify(input)}),
   me:()=>request<{user:AuthUser}>('/api/auth/me'),
+  updateProfile:(input:{firstName?:string;lastName?:string;phone?:string|null;preferredLocale?:Locale})=>request<{user:AuthUser}>('/api/auth/me',{method:'PATCH',body:JSON.stringify(input)}),
   logout:()=>request<{success:boolean}>('/api/auth/logout',{method:'POST'}),
 }

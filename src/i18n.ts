@@ -30,6 +30,7 @@ export function localePath(locale: Locale, destination: string): string {
   if (destination.startsWith('#')) return destination
   const [pathAndQuery, hash = ''] = destination.split('#')
   const [rawPath, query = ''] = pathAndQuery.split('?')
-  const clean = `/${rawPath}`.replace(/^\/(ka|en)(?=\/|$)/, '').replace(/\/{2,}/g, '/')
+  const absolutePath = rawPath.startsWith('/') ? rawPath : `/${rawPath}`
+  const clean = absolutePath.replace(/^\/(ka|en)(?=\/|$)/, '').replace(/\/{2,}/g, '/')
   return `/${locale}${clean === '/' ? '' : clean}${query ? `?${query}` : ''}${hash ? `#${hash}` : ''}`
 }
