@@ -1,4 +1,4 @@
-import { LayoutDashboard, ListOrdered, LogOut, UserRound } from 'lucide-react'
+import { LayoutDashboard, ListOrdered, LogOut, MessageCircle, UserRound } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { useAuth } from '../../auth/AuthContext'
 import { localePath, type Locale } from '../../i18n'
@@ -8,6 +8,7 @@ const copy = {
   ka: {
     overview: 'მიმოხილვა',
     orders: 'შეკვეთები',
+    messages: 'შეტყობინებები',
     profile: 'პროფილი',
     back: 'მარკეტპლეისზე დაბრუნება',
     nav: 'მომწოდებლის პანელი',
@@ -17,6 +18,7 @@ const copy = {
   en: {
     overview: 'Overview',
     orders: 'Orders',
+    messages: 'Messages',
     profile: 'Profile',
     back: 'Back to Marketplace',
     nav: 'Provider Dashboard',
@@ -25,12 +27,10 @@ const copy = {
   },
 } as const
 
-// Provider messaging is intentionally omitted until a provider-oriented message
-// experience exists. Linking to the customer message page would use customer
-// navigation, mock customer orders, and the wrong sender perspective.
 const links = [
   ['overview', '/provider/dashboard', LayoutDashboard],
   ['orders', '/provider/orders', ListOrdered],
+  ['messages', '/provider/messages', MessageCircle],
   ['profile', '/provider/profile', UserRound],
 ] as const
 

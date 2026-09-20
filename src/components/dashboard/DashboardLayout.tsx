@@ -6,7 +6,7 @@ import { useAuth } from '../../auth/AuthContext'
 
 const copy={ka:{studio:'Studio',business:'ჩემი ბიზნესი',overview:'მიმოხილვა',orders:'ჩემი შეკვეთები',favorites:'რჩეულები',messages:'შეტყობინებები',profile:'პროფილი',settings:'პარამეტრები',back:'მარკეტპლეისზე დაბრუნება',nav:'მომხმარებლის სივრცე',language:'English',account:'ანგარიშის მენიუ',roles:{CUSTOMER:'მომხმარებელი',PROVIDER:'მომსახურების მიმწოდებელი',ADMIN:'ადმინისტრატორი'},signOut:'გასვლა',signingOut:'ანგარიშიდან გასვლა...'},en:{studio:'Studio',business:'My Business',overview:'Overview',orders:'My Orders',favorites:'Favorites',messages:'Messages',profile:'Profile',settings:'Settings',back:'Back to Marketplace',nav:'Customer dashboard',language:'ქართული',account:'Account menu',roles:{CUSTOMER:'Customer',PROVIDER:'Service Provider',ADMIN:'Administrator'},signOut:'Sign Out',signingOut:'Signing out...'}} as const
 const dashboardNavigation=[['overview','/dashboard',LayoutDashboard],['studio','/studio',Sparkles],['business','/business',BriefcaseBusiness],['orders','/dashboard/orders',ListOrdered],['favorites','/dashboard/favorites',Heart],['messages','/dashboard/messages',MessageCircle],['profile','/dashboard/profile',UserRound],['settings','/dashboard/settings',Settings]] as const
-const mobileKeys=new Set(['overview','orders','profile','settings'])
+const mobileKeys=new Set(['overview','orders','messages','profile'])
 
 export function DashboardLayout({locale,children}:{locale:Locale;children:ReactNode}) {
  const c=copy[locale];const {user,logout}=useAuth();const [signingOut,setSigningOut]=useState(false);if(!user)return null
