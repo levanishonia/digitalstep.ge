@@ -9,12 +9,12 @@ import {openAIProvider} from '../ai/openAIProvider.js'
 import {AIProviderError} from '../ai/types.js'
 import {aiConfig} from '../ai/config.js'
 import {buildBusinessContext,type BusinessProfile} from '../../shared/businessProfile.js'
-import {contentPillars,ideaObjectives,ideaPlatforms,ideaTimeframes,type ContentIdeaInput} from '../../shared/contentIdeas.js'
+import {contentIdeaCustomInstructionsMaxLength,contentPillars,ideaObjectives,ideaPlatforms,ideaTimeframes,type ContentIdeaInput} from '../../shared/contentIdeas.js'
 import {canUseFeature,getUsageLimit} from '../../src/domain/subscriptions.js'
 
 export const contentIdeasRouter=Router();contentIdeasRouter.use(requireAuth)
 const service=new AIService(openAIProvider),periodKey=()=>new Date().toISOString().slice(0,7)
-const schema=z.object({platforms:z.array(z.enum(ideaPlatforms)).min(1).max(4),objective:z.enum(ideaObjectives),contentPillars:z.array(z.enum(contentPillars)).max(10).default([]),timeframe:z.enum(ideaTimeframes),ideaCount:z.union([z.literal(3),z.literal(5),z.literal(10)]),customInstructions:z.string().trim().max(1000).optional(),language:z.enum(['KA','EN']).optional()}).strict()
+const schema=z.object({platforms:z.array(z.enum(ideaPlatforms)).min(1).max(4),objective:z.enum(ideaObjectives),contentPillars:z.array(z.enum(contentPillars)).max(10).default([]),timeframe:z.enum(ideaTimeframes),ideaCount:z.union([z.literal(3),z.literal(5),z.literal(10)]),customInstructions:z.string().trim().max(contentIdeaCustomInstructionsMaxLength).optional(),language:z.enum(['KA','EN']).optional()}).strict()
 async function context(userId:string){return prisma.user.findUnique({where:{id:userId},select:{subscriptionPlan:true,preferredLocale:true,businessProfile:true}})}
 async function usage(userId:string,plan:'FREE'|'PRO'|'BUSINESS'){const period=periodKey(),limit=getUsageLimit(plan,'CONTENT_IDEA_GENERATIONS'),row=await prisma.aIUsage.findUnique({where:{userId_feature_periodKey:{userId,feature:'CONTENT_IDEAS',periodKey:period}}});return {used:row?.requestCount??0,limit,remaining:Math.max(0,limit-(row?.requestCount??0)),period}}
 async function reserve(userId:string,limit:number){const period=periodKey();return prisma.$transaction(async tx=>{await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`${userId}:CONTENT_IDEAS:${period}`}, 0))`;await tx.aIUsageReservation.deleteMany({where:{expiresAt:{lte:new Date()}}});const row=await tx.aIUsage.upsert({where:{userId_feature_periodKey:{userId,feature:'CONTENT_IDEAS',periodKey:period}},create:{userId,feature:'CONTENT_IDEAS',periodKey:period},update:{}});const active=await tx.aIUsageReservation.count({where:{userId,feature:'CONTENT_IDEAS',periodKey:period,expiresAt:{gt:new Date()}}});if(row.requestCount+active>=limit)return null;return tx.aIUsageReservation.create({data:{userId,feature:'CONTENT_IDEAS',periodKey:period,expiresAt:new Date(Date.now()+aiConfig.reservationLeaseMs)},select:{id:true,periodKey:true}})})}
