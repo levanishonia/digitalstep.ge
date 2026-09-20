@@ -1,0 +1,7 @@
+import { useState } from 'react'
+import { MessageCircle } from 'lucide-react'
+import { localePath, type Locale } from '../../i18n'
+import { MessageApiError, messagesApi } from '../../lib/api/messages'
+
+const copy={ka:{customer:'პროვაიდერთან მიწერა',provider:'მომხმარებელთან მიწერა',loading:'საუბარი იხსნება…',unassigned:'ამ შეკვეთას პროვაიდერი ჯერ არ აქვს მინიჭებული.',error:'საუბრის გახსნა ვერ მოხერხდა'},en:{customer:'Message Provider',provider:'Message Customer',loading:'Opening conversation…',unassigned:'This order does not have an assigned provider yet.',error:'Unable to open conversation'}} as const
+export function OrderMessageButton({locale,orderId,providerView=false}:{locale:Locale;orderId:string;providerView?:boolean}){const c=copy[locale],[busy,setBusy]=useState(false),[error,setError]=useState('');async function open(){if(busy)return;setBusy(true);setError('');try{const {conversation}=await messagesApi.getOrCreateOrderConversation(orderId);window.location.assign(localePath(locale,`${providerView?'/provider/messages':'/dashboard/messages'}/${conversation.id}`))}catch(e){setError(e instanceof MessageApiError&&e.code==='PROVIDER_NOT_ASSIGNED'?c.unassigned:c.error);setBusy(false)}}return <div className="order-message-action"><button type="button" disabled={busy} aria-busy={busy} onClick={()=>void open()}><MessageCircle/>{busy?c.loading:providerView?c.provider:c.customer}</button>{error&&<p role="alert">{error}</p>}</div>}

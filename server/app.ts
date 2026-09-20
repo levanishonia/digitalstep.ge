@@ -5,6 +5,7 @@ import path from 'node:path'
 import { authRouter } from './routes/auth.js'
 import { ordersRouter } from './routes/orders.js'
 import { providerOrdersRouter } from './routes/providerOrders.js'
+import { messagesRouter } from './routes/messages.js'
 import { businessProfileRouter } from './routes/businessProfile.js'
 import { studioAssistantRouter } from './routes/studioAssistant.js'
 import { postGeneratorRouter } from './routes/postGenerator.js'
@@ -25,6 +26,7 @@ app.get('/api/health', (_request, response) => response.json({ status: 'ok' }))
 app.use('/api/auth', authRouter)
 app.use('/api/orders', ordersRouter)
 app.use('/api/provider/orders', providerOrdersRouter)
+app.use('/api/messages', messagesRouter)
 app.use('/api/business-profile', businessProfileRouter)
 app.use('/api/studio', studioAssistantRouter)
 app.use('/api/studio/post-generator', postGeneratorRouter)

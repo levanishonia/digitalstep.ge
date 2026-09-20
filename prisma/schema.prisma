@@ -55,28 +55,31 @@ enum BrandTone {
 }
 
 model User {
-  id               String               @id @default(cuid())
-  email            String               @unique
-  passwordHash     String
-  firstName        String
-  lastName         String
-  phone            String?
-  role             UserRole             @default(CUSTOMER)
-  preferredLocale  String               @default("ka")
-  termsAcceptedAt  DateTime
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @updatedAt
-  orders           Order[]              @relation("CustomerOrders")
-  providerSlug     String?              @unique
-  assignedOrders   Order[]              @relation("ProviderOrders")
-  providerStatus   ProviderStatus       @default(PENDING)
-  subscriptionPlan SubscriptionPlan     @default(FREE)
-  businessProfile  BusinessProfile?
-  aiConversations  AIConversation[]
-  aiUsage          AIUsage[]
-  aiReservations   AIUsageReservation[]
-  aiGenerations    AIGeneration[]
-  contentItems     ContentItem[]
+  id                    String               @id @default(cuid())
+  email                 String               @unique
+  passwordHash          String
+  firstName             String
+  lastName              String
+  phone                 String?
+  role                  UserRole             @default(CUSTOMER)
+  preferredLocale       String               @default("ka")
+  termsAcceptedAt       DateTime
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  orders                Order[]              @relation("CustomerOrders")
+  providerSlug          String?              @unique
+  assignedOrders        Order[]              @relation("ProviderOrders")
+  providerStatus        ProviderStatus       @default(PENDING)
+  subscriptionPlan      SubscriptionPlan     @default(FREE)
+  businessProfile       BusinessProfile?
+  aiConversations       AIConversation[]
+  aiUsage               AIUsage[]
+  aiReservations        AIUsageReservation[]
+  aiGenerations         AIGeneration[]
+  contentItems          ContentItem[]
+  customerConversations Conversation[]       @relation("ConversationCustomer")
+  providerConversations Conversation[]       @relation("ConversationProvider")
+  sentMessages          Message[]            @relation("MessageSender")
 }
 
 enum AIMessageRole {
@@ -258,8 +261,39 @@ model Order {
   deliveryDate     DateTime
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
+  conversation     Conversation?
 
   @@index([customerId, createdAt])
   @@index([customerId, status])
   @@index([providerUserId, status])
+}
+
+model Conversation {
+  id             String    @id @default(cuid())
+  orderId        String    @unique
+  order          Order     @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  customerUserId String
+  customer       User      @relation("ConversationCustomer", fields: [customerUserId], references: [id], onDelete: Restrict)
+  providerUserId String
+  provider       User      @relation("ConversationProvider", fields: [providerUserId], references: [id], onDelete: Restrict)
+  messages       Message[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([customerUserId, updatedAt])
+  @@index([providerUserId, updatedAt])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderUserId   String
+  sender         User         @relation("MessageSender", fields: [senderUserId], references: [id], onDelete: Restrict)
+  content        String
+  createdAt      DateTime     @default(now())
+  readAt         DateTime?
+
+  @@index([conversationId, createdAt])
+  @@index([conversationId, readAt])
 }

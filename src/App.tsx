@@ -25,7 +25,7 @@ export function App() {
   const authPage=segments[0]==='login'?<LoginPage locale={locale}/>:segments[0]==='register'?<RegisterPage locale={locale}/>:segments[0]==='forgot-password'?<ForgotPasswordPage locale={locale}/>:null
   if(authPage)return <AuthLayout locale={locale}>{authPage}</AuthLayout>
   if(segments[0]==='provider'){
-    const page=segments[1]==='orders'&&segments[2]?<ProviderOrderDetail locale={locale} id={segments[2]}/>:segments[1]==='orders'?<ProviderOrders locale={locale}/>:segments[1]==='profile'?<ProviderProfile locale={locale}/>:<ProviderDashboard locale={locale}/>
+    const page=segments[1]==='orders'&&segments[2]?<ProviderOrderDetail locale={locale} id={segments[2]}/>:segments[1]==='orders'?<ProviderOrders locale={locale}/>:segments[1]==='messages'?<MessagesPage locale={locale} conversationId={segments[2]}/>:segments[1]==='profile'?<ProviderProfile locale={locale}/>:<ProviderDashboard locale={locale}/>
     return <RequireRole locale={locale} role="PROVIDER"><ProviderLayout locale={locale}>{page}</ProviderLayout></RequireRole>
   }
   if(segments[0]==='dashboard'){
