@@ -5,7 +5,7 @@ import { rateLimit } from 'express-rate-limit'
 import { prisma } from '../lib/prisma.js'
 import { clearSessionCookie, createSession, setSessionCookie } from '../lib/session.js'
 import { requireAuth } from '../middleware/auth.js'
-import { loginSchema, registerSchema } from '../validation/auth.js'
+import { loginSchema, registerSchema, updateProfileSchema } from '../validation/auth.js'
 
 export const authRouter = Router()
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: 'draft-8', legacyHeaders: false, message: { error: { code: 'RATE_LIMITED' } } })
@@ -42,6 +42,15 @@ authRouter.get('/me', requireAuth, async (request, response, next) => {
   try {
     const user = await prisma.user.findUnique({ where: { id: request.auth!.userId }, select: safeUser })
     if (!user) return response.status(401).json({ error: { code: 'UNAUTHENTICATED' } })
+    return response.json({ data: { user } })
+  } catch (error) { next(error) }
+})
+
+authRouter.patch('/me', requireAuth, async (request, response, next) => {
+  const parsed = updateProfileSchema.safeParse(request.body)
+  if (!parsed.success) return response.status(400).json({ error: { code: 'VALIDATION_ERROR' } })
+  try {
+    const user = await prisma.user.update({ where: { id: request.auth!.userId }, data: parsed.data, select: safeUser })
     return response.json({ data: { user } })
   } catch (error) { next(error) }
 })
