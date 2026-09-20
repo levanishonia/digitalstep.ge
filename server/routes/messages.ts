@@ -64,12 +64,17 @@ messagesRouter.post('/conversations/:id/messages', async (request, response, nex
   } catch (error) { next(error) }
 })
 
+const readSchema = z.object({ messageIds: z.array(z.string().min(1)).max(1000) }).strict()
 messagesRouter.post('/conversations/:id/read', async (request, response, next) => {
+  const parsed = readSchema.safeParse(request.body)
+  if (!parsed.success) return response.status(400).json({ error: { code: 'INVALID_MESSAGE' } })
   try {
     const userId = request.auth!.userId
     const conversation = await prisma.conversation.findFirst({ where: { id: request.params.id, ...memberWhere(userId) }, select: { id: true } })
     if (!conversation) return response.status(404).json({ error: { code: 'CONVERSATION_NOT_FOUND' } })
-    await prisma.message.updateMany({ where: { conversationId: conversation.id, senderUserId: { not: userId }, readAt: null }, data: { readAt: new Date() } })
+    if (parsed.data.messageIds.length > 0) {
+      await prisma.message.updateMany({ where: { id: { in: parsed.data.messageIds }, conversationId: conversation.id, senderUserId: { not: userId }, readAt: null }, data: { readAt: new Date() } })
+    }
     return response.json({ data: { success: true } })
   } catch (error) { next(error) }
 })

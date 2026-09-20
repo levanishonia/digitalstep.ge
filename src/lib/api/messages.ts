@@ -11,6 +11,6 @@ export const messagesApi={
  getConversation:(id:string)=>request<{conversation:ConversationDetail}>(`/api/messages/conversations/${encodeURIComponent(id)}`),
  getOrCreateOrderConversation:(orderId:string)=>request<{conversation:{id:string;orderId:string}}>(`/api/orders/${encodeURIComponent(orderId)}/conversation`,{method:'POST'}),
  sendMessage:(id:string,content:string)=>request<{message:ChatMessage}>(`/api/messages/conversations/${encodeURIComponent(id)}/messages`,{method:'POST',body:JSON.stringify({content})}),
- markConversationRead:(id:string)=>request<{success:true}>(`/api/messages/conversations/${encodeURIComponent(id)}/read`,{method:'POST'}),
+ markConversationRead:(id:string,messageIds:string[])=>request<{success:true}>(`/api/messages/conversations/${encodeURIComponent(id)}/read`,{method:'POST',body:JSON.stringify({messageIds})}),
  getUnreadMessageCount:()=>request<{count:number}>('/api/messages/unread-count'),
 }
