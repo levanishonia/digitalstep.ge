@@ -3,6 +3,7 @@ export const marketingChannels=['META','INSTAGRAM','FACEBOOK','TIKTOK','GOOGLE_A
 export const marketingTimeframes=['7_DAYS','30_DAYS','90_DAYS','CUSTOM'] as const
 export const analysisFocusAreas=['FULL_ANALYSIS','MARKETING','POSITIONING','CUSTOMER_ACQUISITION','CONTENT','DIGITAL_PRESENCE','SALES','AUTOMATION'] as const
 export const actionTypes=['NONE','CONTENT','POST','PLANNING','CALENDAR','MARKETPLACE_SERVICE'] as const
+export const marketingCampaignContextMaxLength=1500
 export type MarketingPlanInput={goal:typeof marketingGoals[number];budgetAmount?:number;currency?:string;timeframe:typeof marketingTimeframes[number];customStart?:string;customEnd?:string;selectedChannels?:typeof marketingChannels[number][];priorityProductOrService?:string;campaignContext?:string;customInstructions?:string;language?:'KA'|'EN'}
 export type MarketingPlanOutput={summary:string;primaryGoal:string;strategy:string;audienceFocus:string;channelPlan:{channel:string;purpose:string;budgetPercent:number|null;budgetAmount:number|null;actions:string[]}[];contentPlan:{contentType:string;frequency:string;purpose:string}[];timeline:{period:string;actions:string[]}[];kpis:{name:string;reason:string}[];nextActions:string[];risks:string[]}
 export type BusinessAnalysisInput={focusArea:typeof analysisFocusAreas[number];currentChallenge?:string;additionalContext?:string;language?:'KA'|'EN'}
