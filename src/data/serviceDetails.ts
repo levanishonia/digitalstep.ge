@@ -52,7 +52,7 @@ const portfolio=(tone:string):PortfolioItem[]=>[
  {id:`${tone}-2`,title:l('ციფრული განახლება','Digital Refresh'),category:l('დიზაინი','Design'),description:l('მობილურზე მორგებული ციფრული გამოცდილება.','A mobile-ready digital experience.'),tone:`${tone} alt`},
  {id:`${tone}-3`,title:l('შედეგების დაფა','Results Dashboard'),category:l('ანალიტიკა','Analytics'),description:l('მთავარი მაჩვენებლების მარტივი ხედვა.','A clear view of the most important metrics.'),tone:`${tone} bright`},
 ]
-const providerServices=[...new Map(catalogServices.map(service=>[service.provider,service])).values()]
+const providerServices=[...new Map(catalogServices.filter(service=>service.serviceSource==='VERIFIED_PROVIDER'&&service.providerStatus==='VERIFIED').map(service=>[service.provider,service])).values()]
 export const providers:Provider[]=providerServices.map(service=>{
  const slug=slugify(service.provider)
  return {id:slug,slug,name:service.provider,type:l('ციფრული სააგენტო','Digital agency'),tagline:l('მკაფიო სტრატეგია, ხარისხიანი შესრულება.','Clear strategy, thoughtful execution.'),description:l('ვქმნით პრაქტიკულ ციფრულ გადაწყვეტილებებს ბიზნესის გაზომვადი მიზნებისთვის. ყველა მონაცემი ამ პროფილზე სადემონსტრაციოა.','We create practical digital solutions for measurable business goals. All profile data shown here is demonstrative.'),location:l('თბილისი, საქართველო','Tbilisi, Georgia'),responseTime:l('დაახლოებით 2 საათი','About 2 hours'),completedProjects:128,specializations:[l('სტრატეგია','Strategy'),l('დიზაინი','Design'),l('ზრდა','Growth')],languages:['ქართული','English'],portfolio:portfolio(service.preview),reviews:reviews(slug)}

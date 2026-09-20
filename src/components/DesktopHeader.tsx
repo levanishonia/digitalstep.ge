@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useId, useState, type FormEvent } from 'react'
 import { Bell, Search, ShoppingCart, SlidersHorizontal } from 'lucide-react'
 import type { Locale } from '../i18n'
 import { dictionary, localePath } from '../i18n'
@@ -8,12 +8,15 @@ export function SearchField({locale}:{locale:Locale}) {
   const searchId = useId()
   const t = dictionary[locale].shell
 
+  const current = window.location.pathname.endsWith('/search') ? new URLSearchParams(window.location.search).get('q') ?? '' : ''
+  const [query,setQuery]=useState(current)
+  function submit(event:FormEvent) { event.preventDefault(); const clean=query.trim(); window.location.assign(clean?localePath(locale,`/search?q=${encodeURIComponent(clean)}`):localePath(locale,'/marketplace')) }
   return (
-    <form className="search" role="search" onSubmit={(event) => event.preventDefault()}>
+    <form className="search" role="search" onSubmit={submit}>
       <Search aria-hidden="true" />
       <label className="visually-hidden" htmlFor={searchId}>{t.search}</label>
-      <input id={searchId} type="search" placeholder={t.searchPlaceholder} />
-      <button type="button" aria-label={t.filters}><SlidersHorizontal aria-hidden="true" /></button>
+      <input id={searchId} name="q" type="search" value={query} onChange={event=>setQuery(event.target.value)} placeholder={t.searchPlaceholder} />
+      <button type="submit" aria-label={t.search}><SlidersHorizontal aria-hidden="true" /></button>
     </form>
   )
 }
