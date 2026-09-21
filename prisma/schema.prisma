@@ -54,6 +54,23 @@ enum BrandTone {
   EDUCATIONAL
 }
 
+enum NotificationType {
+  ORDER_CREATED
+  ORDER_CONFIRMED
+  ORDER_IN_PROGRESS
+  ORDER_IN_REVIEW
+  ORDER_COMPLETED
+  ORDER_CANCELLED
+  NEW_MESSAGE
+  PROVIDER_VERIFIED
+  PROVIDER_SUSPENDED
+  SERVICE_APPROVED
+  SERVICE_REJECTED
+  AI_USAGE_NEAR_LIMIT
+  AI_USAGE_LIMIT_REACHED
+  CONTENT_REMINDER
+}
+
 model User {
   id                    String               @id @default(cuid())
   email                 String               @unique
@@ -81,6 +98,21 @@ model User {
   customerConversations Conversation[]       @relation("ConversationCustomer")
   providerConversations Conversation[]       @relation("ConversationProvider")
   sentMessages          Message[]            @relation("MessageSender")
+  notifications         Notification[]
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  data      Json?
+  dedupeKey String?          @unique
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, readAt])
 }
 
 model ProviderProfile {
