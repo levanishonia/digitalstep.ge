@@ -70,6 +70,7 @@ model User {
   providerSlug          String?              @unique
   assignedOrders        Order[]              @relation("ProviderOrders")
   providerStatus        ProviderStatus       @default(PENDING)
+  providerProfile       ProviderProfile?
   subscriptionPlan      SubscriptionPlan     @default(FREE)
   businessProfile       BusinessProfile?
   aiConversations       AIConversation[]
@@ -80,6 +81,26 @@ model User {
   customerConversations Conversation[]       @relation("ConversationCustomer")
   providerConversations Conversation[]       @relation("ConversationProvider")
   sentMessages          Message[]            @relation("MessageSender")
+}
+
+model ProviderProfile {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slug             String   @unique
+  displayName      String
+  headline         String?
+  description      String?
+  category         String?
+  website          String?
+  location         String?
+  languages        String[]
+  portfolioSummary String?
+  socialLinks      Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([slug])
 }
 
 enum AIMessageRole {
