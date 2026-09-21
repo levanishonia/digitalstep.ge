@@ -18,6 +18,8 @@ import {PostGeneratorPage} from './components/studio/PostGeneratorPage'
 import { BusinessPage, PricingPage } from './components/studio/BusinessAndPricing'
 import { AssistantPage } from './components/studio/AssistantPage'
 import { PlanGate } from './components/studio/PlanGate'
+import { AdminLayout } from './components/admin/AdminLayout'
+import { AdminAIUsage, AdminOrders, AdminOverview, AdminProviders, AdminServices, AdminSubscriptions, AdminUsers } from './components/admin/AdminPages'
 
 export function App() {
   const locale = resolveLocale(window.location.pathname)
@@ -25,6 +27,10 @@ export function App() {
   const segments=window.location.pathname.split('/').filter(Boolean).slice(1)
   const authPage=segments[0]==='login'?<LoginPage locale={locale}/>:segments[0]==='register'?<RegisterPage locale={locale}/>:segments[0]==='forgot-password'?<ForgotPasswordPage locale={locale}/>:null
   if(authPage)return <AuthLayout locale={locale}>{authPage}</AuthLayout>
+  if(segments[0]==='admin'){
+    const page=segments[1]==='users'?<AdminUsers locale={locale}/>:segments[1]==='providers'?<AdminProviders locale={locale}/>:segments[1]==='services'?<AdminServices locale={locale}/>:segments[1]==='orders'?<AdminOrders locale={locale}/>:segments[1]==='subscriptions'?<AdminSubscriptions locale={locale}/>:segments[1]==='ai-usage'?<AdminAIUsage locale={locale}/>:<AdminOverview locale={locale}/>
+    return <RequireRole locale={locale} role="ADMIN"><AdminLayout locale={locale}>{page}</AdminLayout></RequireRole>
+  }
   if(segments[0]==='provider'){
     const page=segments[1]==='orders'&&segments[2]?<ProviderOrderDetail locale={locale} id={segments[2]}/>:segments[1]==='orders'?<ProviderOrders locale={locale}/>:segments[1]==='messages'?<MessagesPage locale={locale} conversationId={segments[2]}/>:segments[1]==='profile'?<ProviderProfile locale={locale}/>:<ProviderDashboard locale={locale}/>
     return <RequireRole locale={locale} role="PROVIDER"><ProviderLayout locale={locale}>{page}</ProviderLayout></RequireRole>
