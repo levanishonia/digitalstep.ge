@@ -8,7 +8,7 @@ import { AIProviderError } from '../ai/types.js'
 import { AIService } from '../ai/service.js'
 import { openAIProvider } from '../ai/openAIProvider.js'
 import { buildBusinessContext, type BusinessProfile } from '../../shared/businessProfile.js'
-import { canUseFeature, getUsageLimit, type SubscriptionPlan } from '../../src/domain/subscriptions.js'
+import { canUseFeature, getUsageLimit, type SubscriptionPlan } from '../../shared/subscriptions.js'
 import { logPrismaError } from '../lib/logPrismaError.js'
 
 export const studioAssistantRouter = Router()

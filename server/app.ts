@@ -13,6 +13,7 @@ import {contentIdeasRouter} from './routes/contentIdeas.js'
 import {contentItemsRouter} from './routes/contentItems.js'
 import {businessAnalysisRouter,marketingPlannerRouter} from './routes/analysisTools.js'
 import { logPrismaError } from './lib/logPrismaError.js'
+import { subscriptionRouter } from './routes/subscription.js'
 
 export const app = express()
 app.disable('x-powered-by')
@@ -24,6 +25,7 @@ app.use(express.json({ limit: '100kb' }))
 app.use(cookieParser())
 app.get('/api/health', (_request, response) => response.json({ status: 'ok' }))
 app.use('/api/auth', authRouter)
+app.use('/api/subscription', subscriptionRouter)
 app.use('/api/orders', ordersRouter)
 app.use('/api/provider/orders', providerOrdersRouter)
 app.use('/api/messages', messagesRouter)
