@@ -17,6 +17,7 @@ import {ContentCalendarPage} from './components/studio/ContentCalendarPage'
 import {PostGeneratorPage} from './components/studio/PostGeneratorPage'
 import { BusinessPage, PricingPage } from './components/studio/BusinessAndPricing'
 import { AssistantPage } from './components/studio/AssistantPage'
+import { PlanGate } from './components/studio/PlanGate'
 
 export function App() {
   const locale = resolveLocale(window.location.pathname)
@@ -33,7 +34,7 @@ export function App() {
     return <RequireAuth locale={locale}><DashboardLayout locale={locale}>{page}</DashboardLayout></RequireAuth>
   }
   if(segments[0]==='studio'){
-    const page=segments[1]==='assistant'?<AssistantPage locale={locale}/>:segments[1]==='post-generator'?<PostGeneratorPage locale={locale}/>:segments[1]==='content-calendar'?<ContentCalendarPage locale={locale}/>:segments[1]==='content-ideas'?<ContentIdeasPage locale={locale}/>:segments[1]==='marketing-planner'?<MarketingPlannerPage locale={locale}/>:segments[1]==='business-analysis'?<BusinessAnalysisPage locale={locale}/>:<StudioHome locale={locale}/>
+    const page=segments[1]==='assistant'?<AssistantPage locale={locale}/>:segments[1]==='post-generator'?<PostGeneratorPage locale={locale}/>:segments[1]==='content-calendar'?<ContentCalendarPage locale={locale}/>:segments[1]==='content-ideas'?<ContentIdeasPage locale={locale}/>:segments[1]==='marketing-planner'?<PlanGate locale={locale} feature="MARKETING_PLANNER"><MarketingPlannerPage locale={locale}/></PlanGate>:segments[1]==='business-analysis'?<PlanGate locale={locale} feature="BUSINESS_ANALYSIS"><BusinessAnalysisPage locale={locale}/></PlanGate>:<StudioHome locale={locale}/>
     return <RequireAuth locale={locale}><DashboardLayout locale={locale}><StudioLayout locale={locale}>{page}</StudioLayout></DashboardLayout></RequireAuth>
   }
   if(segments[0]==='business')return <RequireAuth locale={locale}><DashboardLayout locale={locale}><BusinessPage locale={locale}/></DashboardLayout></RequireAuth>

@@ -10,7 +10,7 @@ import {AIProviderError} from '../ai/types.js'
 import {aiConfig} from '../ai/config.js'
 import {buildBusinessContext,type BusinessProfile} from '../../shared/businessProfile.js'
 import {contentIdeaCustomInstructionsMaxLength,contentPillars,ideaObjectives,ideaPlatforms,ideaTimeframes,type ContentIdeaInput} from '../../shared/contentIdeas.js'
-import {canUseFeature,getUsageLimit} from '../../src/domain/subscriptions.js'
+import {canUseFeature,getUsageLimit} from '../../shared/subscriptions.js'
 
 export const contentIdeasRouter=Router();contentIdeasRouter.use(requireAuth)
 const service=new AIService(openAIProvider),periodKey=()=>new Date().toISOString().slice(0,7)
