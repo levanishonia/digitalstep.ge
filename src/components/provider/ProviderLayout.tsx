@@ -3,6 +3,7 @@ import { useState, type ReactNode } from 'react'
 import { useAuth } from '../../auth/AuthContext'
 import { localePath, type Locale } from '../../i18n'
 import { Logo } from '../Logo'
+import { NotificationCenter } from '../NotificationCenter'
 
 const copy = {
   ka: {
@@ -94,6 +95,7 @@ export function ProviderLayout({ locale, children }: { locale: Locale; children:
         <header className="dashboard-header">
           <div className="dashboard-mobile-brand"><Logo href={localePath(locale, '/')} /></div>
           <strong>{c.nav}</strong>
+          <NotificationCenter locale={locale}/>
           <a className="language-switch" href={localePath(locale === 'ka' ? 'en' : 'ka', path)}>
             {locale === 'ka' ? 'English' : 'ქართული'}
           </a>

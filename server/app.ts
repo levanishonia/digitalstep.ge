@@ -16,6 +16,7 @@ import { logPrismaError } from './lib/logPrismaError.js'
 import { subscriptionRouter } from './routes/subscription.js'
 import { providerProfileRouter } from './routes/providerProfile.js'
 import { adminRouter } from './routes/admin.js'
+import { notificationsRouter } from './routes/notifications.js'
 
 export const app = express()
 app.disable('x-powered-by')
@@ -33,6 +34,7 @@ app.use('/api/provider/orders', providerOrdersRouter)
 app.use('/api/provider/profile', providerProfileRouter)
 app.use('/api/admin', adminRouter)
 app.use('/api/messages', messagesRouter)
+app.use('/api/notifications', notificationsRouter)
 app.use('/api/business-profile', businessProfileRouter)
 app.use('/api/studio', studioAssistantRouter)
 app.use('/api/studio/post-generator', postGeneratorRouter)

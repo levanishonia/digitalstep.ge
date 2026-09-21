@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { z } from 'zod'
 import { prisma } from '../lib/prisma.js'
 import { requireAuth } from '../middleware/auth.js'
+import { createNotification } from '../lib/notifications.js'
 
 export const messagesRouter = Router()
 messagesRouter.use(requireAuth)
@@ -53,13 +54,15 @@ messagesRouter.post('/conversations/:id/messages', async (request, response, nex
   if (!parsed.success) return response.status(400).json({ error: { code: 'INVALID_MESSAGE' } })
   try {
     const userId = request.auth!.userId
-    const conversation = await prisma.conversation.findFirst({ where: { id: request.params.id, ...memberWhere(userId) }, select: { id: true } })
+    const conversation = await prisma.conversation.findFirst({ where: { id: request.params.id, ...memberWhere(userId) }, select: { id: true, customerUserId: true, providerUserId: true } })
     if (!conversation) return response.status(404).json({ error: { code: 'CONVERSATION_NOT_FOUND' } })
     const message = await prisma.$transaction(async (tx) => {
       const saved = await tx.message.create({ data: { conversationId: conversation.id, senderUserId: userId, content: parsed.data.content }, select: { id: true, senderUserId: true, content: true, createdAt: true, readAt: true } })
       await tx.conversation.update({ where: { id: conversation.id }, data: { updatedAt: new Date() } })
       return saved
     })
+    const recipientId = conversation.customerUserId === userId ? conversation.providerUserId : conversation.customerUserId
+    await createNotification({ userId: recipientId, type: 'NEW_MESSAGE', data: { conversationId: conversation.id, recipientPerspective: conversation.providerUserId === recipientId ? 'PROVIDER' : 'CUSTOMER' } })
     return response.status(201).json({ data: { message } })
   } catch (error) { next(error) }
 })
