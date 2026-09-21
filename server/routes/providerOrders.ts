@@ -51,7 +51,7 @@ providerOrdersRouter.patch('/:id/status', async (request, response, next) => {
     if (!current) return response.status(404).json({ error: { code: 'ORDER_NOT_FOUND' } })
     if (!canProviderTransitionOrderStatus(current.status, parsed.data.status)) return response.status(409).json({ error: { code: 'INVALID_STATUS_TRANSITION' } })
     const order = await prisma.order.update({ where: { id: request.params.id }, data: { status: parsed.data.status }, include })
-    await createNotification({ userId: order.customerId, type: `ORDER_${order.status}` as 'ORDER_CONFIRMED'|'ORDER_IN_PROGRESS'|'ORDER_IN_REVIEW'|'ORDER_COMPLETED'|'ORDER_CANCELLED', data: { orderId: order.id, orderNumber: order.orderNumber } })
+    await createNotification({ userId: order.customerId, type: `ORDER_${order.status}` as 'ORDER_CONFIRMED'|'ORDER_IN_PROGRESS'|'ORDER_IN_REVIEW'|'ORDER_COMPLETED'|'ORDER_CANCELLED', data: { orderId: order.id, orderNumber: order.orderNumber, recipientPerspective: 'CUSTOMER' } })
     return response.json({ data: { order: safe(order) } })
   } catch (error) { next(error) }
 })

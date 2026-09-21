@@ -62,7 +62,7 @@ messagesRouter.post('/conversations/:id/messages', async (request, response, nex
       return saved
     })
     const recipientId = conversation.customerUserId === userId ? conversation.providerUserId : conversation.customerUserId
-    await createNotification({ userId: recipientId, type: 'NEW_MESSAGE', data: { conversationId: conversation.id } })
+    await createNotification({ userId: recipientId, type: 'NEW_MESSAGE', data: { conversationId: conversation.id, recipientPerspective: conversation.providerUserId === recipientId ? 'PROVIDER' : 'CUSTOMER' } })
     return response.status(201).json({ data: { message } })
   } catch (error) { next(error) }
 })

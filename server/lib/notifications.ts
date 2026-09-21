@@ -8,6 +8,7 @@ type SafeNotificationData = {
   serviceId?: string
   feature?: string
   period?: string
+  recipientPerspective?: 'CUSTOMER' | 'PROVIDER'
 }
 
 /** Notifications are non-critical: a successful domain action is never undone if this write fails. */
