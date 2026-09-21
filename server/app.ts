@@ -14,6 +14,7 @@ import {contentItemsRouter} from './routes/contentItems.js'
 import {businessAnalysisRouter,marketingPlannerRouter} from './routes/analysisTools.js'
 import { logPrismaError } from './lib/logPrismaError.js'
 import { subscriptionRouter } from './routes/subscription.js'
+import { providerProfileRouter } from './routes/providerProfile.js'
 
 export const app = express()
 app.disable('x-powered-by')
@@ -28,6 +29,7 @@ app.use('/api/auth', authRouter)
 app.use('/api/subscription', subscriptionRouter)
 app.use('/api/orders', ordersRouter)
 app.use('/api/provider/orders', providerOrdersRouter)
+app.use('/api/provider/profile', providerProfileRouter)
 app.use('/api/messages', messagesRouter)
 app.use('/api/business-profile', businessProfileRouter)
 app.use('/api/studio', studioAssistantRouter)

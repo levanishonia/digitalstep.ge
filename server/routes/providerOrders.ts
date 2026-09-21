@@ -44,6 +44,8 @@ providerOrdersRouter.patch('/:id/status', async (request, response, next) => {
   const parsed = providerStatusUpdateSchema.safeParse(request.body)
   if (!parsed.success) return response.status(400).json({ error: { code: 'INVALID_STATUS_TRANSITION' } })
   try {
+    const account = await prisma.user.findUnique({ where: { id: request.auth!.userId }, select: { providerStatus: true } })
+    if (account?.providerStatus === 'SUSPENDED') return response.status(403).json({ error: { code: 'FORBIDDEN' } })
     const current = await prisma.order.findFirst({ where: { id: request.params.id, providerUserId: request.auth!.userId }, select: { status: true } })
     if (!current) return response.status(404).json({ error: { code: 'ORDER_NOT_FOUND' } })
     if (!canProviderTransitionOrderStatus(current.status, parsed.data.status)) return response.status(409).json({ error: { code: 'INVALID_STATUS_TRANSITION' } })
