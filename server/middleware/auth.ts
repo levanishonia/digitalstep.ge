@@ -19,3 +19,7 @@ export async function requireAuth(request: Request, response: Response, next: Ne
 
 export const requireRole = (...roles: UserRole[]) => (request: Request, response: Response, next: NextFunction) =>
   request.auth && roles.includes(request.auth.role) ? next() : response.status(403).json({ error: { code: 'FORBIDDEN' } })
+
+/** Admin APIs use a distinct, stable error code so clients never infer access from UI state. */
+export const requireAdmin = (request: Request, response: Response, next: NextFunction) =>
+  request.auth?.role === 'ADMIN' ? next() : response.status(403).json({ error: { code: 'ADMIN_FORBIDDEN' } })
