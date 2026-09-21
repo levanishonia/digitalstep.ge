@@ -30,11 +30,9 @@ providerProfileRouter.put('/me', async (request, response, next) => {
   try {
     const { socialLinks, ...values } = parsed.data
     const profile = await prisma.$transaction(async transaction => {
-      const existing = await transaction.providerProfile.findUnique({ where: { userId: request.auth!.userId }, select: { slug: true } })
       const conflict = await transaction.providerProfile.findFirst({ where: { slug: values.slug, userId: { not: request.auth!.userId } }, select: { id: true } })
       if (conflict) throw new Error('SLUG_TAKEN')
       const saved = await transaction.providerProfile.upsert({ where: { userId: request.auth!.userId }, create: { userId: request.auth!.userId, ...values, socialLinks }, update: { ...values, socialLinks }, select: profileSelect })
-      if (!existing || existing.slug !== saved.slug) await transaction.user.update({ where: { id: request.auth!.userId }, data: { providerSlug: saved.slug } })
       return saved
     })
     return response.json({ data: { profile: { ...profile, socialLinks: Array.isArray(profile.socialLinks) ? profile.socialLinks : [] } } })
