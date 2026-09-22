@@ -300,6 +300,7 @@ model Order {
   serviceSlug      String
   serviceTitleKa   String
   serviceTitleEn   String
+  serviceSource    ServiceSource @default(VERIFIED_PROVIDER)
   providerSlug     String
   providerName     String
   packageId        String
@@ -355,7 +356,7 @@ model Message {
 /// immutable catalog id/source remain in code; administrators can only store
 /// an explicit, validated presentation/status override here.
 model CatalogServiceOverride {
-  serviceId       String   @id
+  serviceId       String        @id
   titleKa         String
   titleEn         String
   descriptionKa   String
@@ -363,8 +364,24 @@ model CatalogServiceOverride {
   category        String
   priceMinor      Int
   deliveryDays    Int
-  status          String   @default("ACTIVE")
+  status          ServiceStatus @default(ACTIVE)
+  /// Custom rows are administrator-created official services. Code-owned rows
+  /// remain protected presentation overrides.
+  isCustom        Boolean       @default(false)
+  statusOnly      Boolean       @default(false)
+  slug            String?       @unique
+  serviceSource   ServiceSource @default(DIGITAL_STEP)
   packages        Json?
-  updatedAt       DateTime @updatedAt
+  updatedAt       DateTime      @updatedAt
   updatedByUserId String
+}
+
+enum ServiceStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum ServiceSource {
+  DIGITAL_STEP
+  VERIFIED_PROVIDER
 }

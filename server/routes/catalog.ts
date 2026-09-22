@@ -19,6 +19,10 @@ catalogRouter.get('/overrides', async (_request, response, next) => {
         deliveryDays: true,
         status: true,
         packages: true,
+        isCustom: true,
+        statusOnly: true,
+        slug: true,
+        serviceSource: true,
       },
     })
     response.json({ data: { overrides } })
