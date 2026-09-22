@@ -11,8 +11,9 @@ import {aiConfig} from '../ai/config.js'
 import {buildBusinessContext,type BusinessProfile} from '../../shared/businessProfile.js'
 import {contentIdeaCustomInstructionsMaxLength,contentPillars,ideaObjectives,ideaPlatforms,ideaTimeframes,type ContentIdeaInput} from '../../shared/contentIdeas.js'
 import {canUseFeature,getUsageLimit} from '../../shared/subscriptions.js'
+import {requireStudioFeature} from '../middleware/studioEntitlement.js'
 
-export const contentIdeasRouter=Router();contentIdeasRouter.use(requireAuth)
+export const contentIdeasRouter=Router();contentIdeasRouter.use(requireAuth,requireStudioFeature('CONTENT_IDEAS'))
 const service=new AIService(openAIProvider),periodKey=()=>new Date().toISOString().slice(0,7)
 const schema=z.object({platforms:z.array(z.enum(ideaPlatforms)).min(1).max(4),objective:z.enum(ideaObjectives),contentPillars:z.array(z.enum(contentPillars)).max(10).default([]),timeframe:z.enum(ideaTimeframes),ideaCount:z.union([z.literal(3),z.literal(5),z.literal(10)]),customInstructions:z.string().trim().max(contentIdeaCustomInstructionsMaxLength).optional(),language:z.enum(['KA','EN']).optional()}).strict()
 async function context(userId:string){return prisma.user.findUnique({where:{id:userId},select:{subscriptionPlan:true,preferredLocale:true,businessProfile:true}})}

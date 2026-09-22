@@ -11,8 +11,9 @@ import {aiConfig} from '../ai/config.js'
 import {buildBusinessContext,type BusinessProfile} from '../../shared/businessProfile.js'
 import {postLanguages,postObjectives,postPlatforms,postTones,type PostGenerationInput,type PostGenerationOutput} from '../../shared/postGenerator.js'
 import {canUseFeature,getUsageLimit} from '../../shared/subscriptions.js'
+import {requireStudioFeature} from '../middleware/studioEntitlement.js'
 
-export const postGeneratorRouter=Router();postGeneratorRouter.use(requireAuth)
+export const postGeneratorRouter=Router();postGeneratorRouter.use(requireAuth,requireStudioFeature('POST_GENERATOR'))
 const service=new AIService(openAIProvider),periodKey=()=>new Date().toISOString().slice(0,7)
 const requestSchema=z.object({platform:z.enum(postPlatforms),objective:z.enum(postObjectives),language:z.enum(postLanguages),tone:z.enum(postTones),topic:z.string().trim().min(2).max(500),keyMessage:z.string().trim().max(1000).optional(),offer:z.string().trim().max(500).optional(),callToAction:z.string().trim().max(300).optional(),customInstructions:z.string().trim().max(1000).optional(),variationCount:z.union([z.literal(1),z.literal(2),z.literal(3)])}).strict()
 const id=z.string().cuid(),limiter=rateLimit({windowMs:60_000,limit:8,standardHeaders:true,legacyHeaders:false,handler:(_q,r)=>r.status(429).json({error:{code:'RATE_LIMITED'}})})

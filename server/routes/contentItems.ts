@@ -3,7 +3,8 @@ import {z} from 'zod'
 import {prisma} from '../lib/prisma.js'
 import {requireAuth} from '../middleware/auth.js'
 import {contentTypes,ideaPlatforms} from '../../shared/contentIdeas.js'
-export const contentItemsRouter=Router();contentItemsRouter.use(requireAuth)
+import {requireStudioFeature} from '../middleware/studioEntitlement.js'
+export const contentItemsRouter=Router();contentItemsRouter.use(requireAuth,requireStudioFeature('CONTENT_CALENDAR'))
 const statuses=['IDEA','DRAFT','READY','SCHEDULED','PUBLISHED'] as const,sources=['MANUAL','AI_CONTENT_IDEA','AI_POST_GENERATOR'] as const
 const fields={title:z.string().trim().min(1).max(300),caption:z.string().max(10000),notes:z.string().max(3000).nullable().optional(),platform:z.enum(ideaPlatforms),contentType:z.enum(contentTypes),status:z.enum(statuses),scheduledAt:z.string().datetime().nullable()}
 const createSchema=z.object({...fields,caption:fields.caption.default(''),source:z.enum(sources).optional(),sourceGenerationId:z.string().cuid().nullable().optional()}).strict()

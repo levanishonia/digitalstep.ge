@@ -2,7 +2,7 @@ import type { Locale } from '../../i18n'
 
 export type UserRole = 'CUSTOMER' | 'PROVIDER' | 'ADMIN'
 export interface AuthUser { id:string; firstName:string; lastName:string; email:string; phone:string|null; role:UserRole; preferredLocale:Locale; providerSlug:string|null; providerStatus:'PENDING'|'VERIFIED'|'SUSPENDED'; subscriptionPlan:'FREE'|'PRO'|'BUSINESS' }
-export type ApiErrorCode = 'INVALID_CREDENTIALS'|'EMAIL_ALREADY_EXISTS'|'VALIDATION_ERROR'|'PAYLOAD_TOO_LARGE'|'UNAUTHENTICATED'|'FORBIDDEN'|'INTERNAL_ERROR'|'RATE_LIMITED'|'NETWORK_ERROR'
+export type ApiErrorCode = 'INVALID_CREDENTIALS'|'EMAIL_ALREADY_EXISTS'|'VALIDATION_ERROR'|'CURRENT_PASSWORD_INCORRECT'|'NEW_PASSWORD_SAME_AS_CURRENT'|'PAYLOAD_TOO_LARGE'|'UNAUTHENTICATED'|'FORBIDDEN'|'INTERNAL_ERROR'|'RATE_LIMITED'|'NETWORK_ERROR'
 export class AuthApiError extends Error { constructor(public code:ApiErrorCode) { super(code) } }
 
 async function request<T>(path:string, options?:RequestInit):Promise<T> {
@@ -18,5 +18,6 @@ export const authApi={
   register:(input:{firstName:string;lastName:string;email:string;phone?:string;password:string;role:'CUSTOMER'|'PROVIDER';preferredLocale:Locale;termsAccepted:true})=>request<{user:AuthUser}>('/api/auth/register',{method:'POST',body:JSON.stringify(input)}),
   me:()=>request<{user:AuthUser}>('/api/auth/me'),
   updateProfile:(input:{firstName?:string;lastName?:string;phone?:string|null;preferredLocale?:Locale})=>request<{user:AuthUser}>('/api/auth/me',{method:'PATCH',body:JSON.stringify(input)}),
+  changePassword:(input:{currentPassword:string;newPassword:string})=>request<{success:boolean}>('/api/auth/me/password',{method:'PATCH',body:JSON.stringify(input)}),
   logout:()=>request<{success:boolean}>('/api/auth/logout',{method:'POST'}),
 }
