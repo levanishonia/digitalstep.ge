@@ -20,30 +20,37 @@ import { AssistantPage } from './components/studio/AssistantPage'
 import { PlanGate } from './components/studio/PlanGate'
 import { AdminLayout } from './components/admin/AdminLayout'
 import { AdminAIUsage, AdminOrders, AdminOverview, AdminProviders, AdminServices, AdminSubscriptions, AdminUsers } from './components/admin/AdminPages'
+import { NotFoundPage } from './components/NotFoundPage'
+import { locales, localePath } from './i18n'
 
 export function App() {
   const locale = resolveLocale(window.location.pathname)
   useEffect(() => { document.documentElement.lang = locale }, [locale])
-  const segments=window.location.pathname.split('/').filter(Boolean).slice(1)
+  const allSegments=window.location.pathname.split('/').filter(Boolean)
+  if (!locales.includes(allSegments[0] as 'ka' | 'en')) {
+    window.location.replace(localePath('ka', `${window.location.pathname}${window.location.search}${window.location.hash}`))
+    return null
+  }
+  const segments=allSegments.slice(1)
   const authPage=segments[0]==='login'?<LoginPage locale={locale}/>:segments[0]==='register'?<RegisterPage locale={locale}/>:segments[0]==='forgot-password'?<ForgotPasswordPage locale={locale}/>:null
-  if(authPage)return <AuthLayout locale={locale}>{authPage}</AuthLayout>
+  if(authPage&&segments.length===1)return <AuthLayout locale={locale}>{authPage}</AuthLayout>
   if(segments[0]==='admin'){
-    const page=segments[1]==='users'?<AdminUsers locale={locale}/>:segments[1]==='providers'?<AdminProviders locale={locale}/>:segments[1]==='services'?<AdminServices locale={locale}/>:segments[1]==='orders'?<AdminOrders locale={locale}/>:segments[1]==='subscriptions'?<AdminSubscriptions locale={locale}/>:segments[1]==='ai-usage'?<AdminAIUsage locale={locale}/>:<AdminOverview locale={locale}/>
+    const page=segments.length===1?<AdminOverview locale={locale}/>:segments.length===2&&segments[1]==='users'?<AdminUsers locale={locale}/>:segments.length===2&&segments[1]==='providers'?<AdminProviders locale={locale}/>:segments.length===2&&segments[1]==='services'?<AdminServices locale={locale}/>:segments.length===2&&segments[1]==='orders'?<AdminOrders locale={locale}/>:segments.length===2&&segments[1]==='subscriptions'?<AdminSubscriptions locale={locale}/>:segments.length===2&&segments[1]==='ai-usage'?<AdminAIUsage locale={locale}/>:<NotFoundPage locale={locale}/>
     return <RequireRole locale={locale} role="ADMIN"><AdminLayout locale={locale}>{page}</AdminLayout></RequireRole>
   }
   if(segments[0]==='provider'){
-    const page=segments[1]==='orders'&&segments[2]?<ProviderOrderDetail locale={locale} id={segments[2]}/>:segments[1]==='orders'?<ProviderOrders locale={locale}/>:segments[1]==='messages'?<MessagesPage locale={locale} conversationId={segments[2]}/>:segments[1]==='profile'?<ProviderProfile locale={locale}/>:<ProviderDashboard locale={locale}/>
+    const page=segments.length===2&&segments[1]==='dashboard'?<ProviderDashboard locale={locale}/>:segments.length===3&&segments[1]==='orders'?<ProviderOrderDetail locale={locale} id={segments[2]}/>:segments.length===2&&segments[1]==='orders'?<ProviderOrders locale={locale}/>:segments.length<=3&&segments[1]==='messages'?<MessagesPage locale={locale} conversationId={segments[2]}/>:segments.length===2&&segments[1]==='profile'?<ProviderProfile locale={locale}/>:<NotFoundPage locale={locale}/>
     return <RequireRole locale={locale} role="PROVIDER"><ProviderLayout locale={locale}>{page}</ProviderLayout></RequireRole>
   }
   if(segments[0]==='dashboard'){
-    const page=segments[1]==='orders'&&segments[2]?<OrderDetailPage locale={locale} id={segments[2]}/>:segments[1]==='orders'?<OrdersPage locale={locale}/>:segments[1]==='profile'?<ProfilePage locale={locale}/>:segments[1]==='settings'?<SettingsPage locale={locale}/>:segments[1]==='messages'?<MessagesPage locale={locale} conversationId={segments[2]}/>:segments[1]==='favorites'?<FavoritesPlaceholder locale={locale}/>:<DashboardOverview locale={locale}/>
+    const page=segments.length===1?<DashboardOverview locale={locale}/>:segments.length===3&&segments[1]==='orders'?<OrderDetailPage locale={locale} id={segments[2]}/>:segments.length===2&&segments[1]==='orders'?<OrdersPage locale={locale}/>:segments.length===2&&segments[1]==='profile'?<ProfilePage locale={locale}/>:segments.length===2&&segments[1]==='settings'?<SettingsPage locale={locale}/>:segments.length<=3&&segments[1]==='messages'?<MessagesPage locale={locale} conversationId={segments[2]}/>:segments.length===2&&segments[1]==='favorites'?<FavoritesPlaceholder locale={locale}/>:<NotFoundPage locale={locale}/>
     return <RequireAuth locale={locale}><DashboardLayout locale={locale}>{page}</DashboardLayout></RequireAuth>
   }
   if(segments[0]==='studio'){
-    const page=segments[1]==='assistant'?<AssistantPage locale={locale}/>:segments[1]==='post-generator'?<PostGeneratorPage locale={locale}/>:segments[1]==='content-calendar'?<ContentCalendarPage locale={locale}/>:segments[1]==='content-ideas'?<ContentIdeasPage locale={locale}/>:segments[1]==='marketing-planner'?<PlanGate locale={locale} feature="MARKETING_PLANNER"><MarketingPlannerPage locale={locale}/></PlanGate>:segments[1]==='business-analysis'?<PlanGate locale={locale} feature="BUSINESS_ANALYSIS"><BusinessAnalysisPage locale={locale}/></PlanGate>:<StudioHome locale={locale}/>
+    const page=segments.length===1?<StudioHome locale={locale}/>:segments.length===2&&segments[1]==='assistant'?<AssistantPage locale={locale}/>:segments.length===2&&segments[1]==='post-generator'?<PostGeneratorPage locale={locale}/>:segments.length===2&&segments[1]==='content-calendar'?<ContentCalendarPage locale={locale}/>:segments.length===2&&segments[1]==='content-ideas'?<ContentIdeasPage locale={locale}/>:segments.length===2&&segments[1]==='marketing-planner'?<PlanGate locale={locale} feature="MARKETING_PLANNER"><MarketingPlannerPage locale={locale}/></PlanGate>:segments.length===2&&segments[1]==='business-analysis'?<PlanGate locale={locale} feature="BUSINESS_ANALYSIS"><BusinessAnalysisPage locale={locale}/></PlanGate>:<NotFoundPage locale={locale}/>
     return <RequireAuth locale={locale}><DashboardLayout locale={locale}><StudioLayout locale={locale}>{page}</StudioLayout></DashboardLayout></RequireAuth>
   }
-  if(segments[0]==='business')return <RequireAuth locale={locale}><DashboardLayout locale={locale}><BusinessPage locale={locale}/></DashboardLayout></RequireAuth>
-  if(segments[0]==='pricing')return <RequireAuth locale={locale}><DashboardLayout locale={locale}><PricingPage locale={locale}/></DashboardLayout></RequireAuth>
+  if(segments[0]==='business'&&segments.length===1)return <RequireAuth locale={locale}><DashboardLayout locale={locale}><BusinessPage locale={locale}/></DashboardLayout></RequireAuth>
+  if(segments[0]==='pricing'&&segments.length===1)return <RequireAuth locale={locale}><DashboardLayout locale={locale}><PricingPage locale={locale}/></DashboardLayout></RequireAuth>
   return <MarketplaceShell locale={locale} />
 }
