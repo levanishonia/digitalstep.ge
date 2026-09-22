@@ -17,6 +17,7 @@ import { subscriptionRouter } from './routes/subscription.js'
 import { providerProfileRouter } from './routes/providerProfile.js'
 import { adminRouter } from './routes/admin.js'
 import { notificationsRouter } from './routes/notifications.js'
+import { catalogRouter } from './routes/catalog.js'
 
 export const app = express()
 app.disable('x-powered-by')
@@ -33,6 +34,7 @@ app.use('/api/orders', ordersRouter)
 app.use('/api/provider/orders', providerOrdersRouter)
 app.use('/api/provider/profile', providerProfileRouter)
 app.use('/api/admin', adminRouter)
+app.use('/api/catalog', catalogRouter)
 app.use('/api/messages', messagesRouter)
 app.use('/api/notifications', notificationsRouter)
 app.use('/api/business-profile', businessProfileRouter)
