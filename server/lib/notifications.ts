@@ -23,7 +23,8 @@ export async function createNotification(input: { userId: string; type: Notifica
 
 /** Creates one threshold notification per feature and calendar month. */
 export async function notifyAIUsageThreshold(input: { userId:string; feature:string; period:string; used:number; limit:number }) {
-  const threshold=input.used>=input.limit?'AI_USAGE_LIMIT_REACHED':input.used>=Math.ceil(input.limit*.8)?'AI_USAGE_NEAR_LIMIT':null
+  const nearLimit=Math.ceil(input.limit*.8)
+  const threshold=input.used===input.limit?'AI_USAGE_LIMIT_REACHED':input.used===nearLimit?'AI_USAGE_NEAR_LIMIT':null
   if(!threshold)return
   await createNotification({userId:input.userId,type:threshold,data:{feature:input.feature,period:input.period},dedupeKey:`${threshold}:${input.userId}:${input.feature}:${input.period}`})
 }

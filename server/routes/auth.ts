@@ -63,7 +63,13 @@ authRouter.patch('/me/password', requireAuth, authLimiter, async (request, respo
     if (!account) return response.status(401).json({ error: { code: 'UNAUTHENTICATED' } })
     if (!(await verifyPassword(parsed.data.currentPassword, account.passwordHash))) return response.status(400).json({ error: { code: 'CURRENT_PASSWORD_INCORRECT' } })
     if (await verifyPassword(parsed.data.newPassword, account.passwordHash)) return response.status(400).json({ error: { code: 'NEW_PASSWORD_SAME_AS_CURRENT' } })
-    await prisma.user.update({ where: { id: account.id }, data: { passwordHash: await hashPassword(parsed.data.newPassword) }, select: { id: true } })
+    const updated = await prisma.user.updateMany({
+      where: { id: account.id, passwordHash: account.passwordHash },
+      data: { passwordHash: await hashPassword(parsed.data.newPassword) },
+    })
+    // A concurrent password change invalidates the hash this request verified.
+    // Never report success for a password that was not actually installed.
+    if (updated.count !== 1) return response.status(400).json({ error: { code: 'CURRENT_PASSWORD_INCORRECT' } })
     return response.json({ data: { success: true } })
   } catch (error) { next(error) }
 })
