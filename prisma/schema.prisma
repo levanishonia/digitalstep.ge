@@ -300,6 +300,7 @@ model Order {
   serviceSlug      String
   serviceTitleKa   String
   serviceTitleEn   String
+  serviceSource    ServiceSource @default(VERIFIED_PROVIDER)
   providerSlug     String
   providerName     String
   packageId        String

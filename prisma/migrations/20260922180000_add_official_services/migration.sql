@@ -10,6 +10,13 @@ ALTER TABLE "CatalogServiceOverride"
   ADD COLUMN "slug" TEXT,
   ADD COLUMN "serviceSource" "ServiceSource" NOT NULL DEFAULT 'DIGITAL_STEP';
 
+ALTER TABLE "Order"
+  ADD COLUMN "serviceSource" "ServiceSource" NOT NULL DEFAULT 'VERIFIED_PROVIDER';
+
+UPDATE "Order"
+SET "serviceSource" = 'DIGITAL_STEP'
+WHERE "serviceId" IN ('seo-audit', 'process-automation', 'local-seo', 'ai-chat-workflow');
+
 CREATE UNIQUE INDEX "CatalogServiceOverride_slug_key" ON "CatalogServiceOverride"("slug");
 
 UPDATE "CatalogServiceOverride"
