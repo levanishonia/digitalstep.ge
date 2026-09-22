@@ -1,6 +1,6 @@
 export type CatalogLocale = 'ka' | 'en'
 export interface OrderCatalogPackage { id:'basic'|'standard'|'premium'; name:Record<CatalogLocale,string>; priceMinor:number; deliveryDays:number; features:Record<CatalogLocale,string>[] }
-export interface OrderCatalogService { id:string; slug:string; title:Record<CatalogLocale,string>; providerName:string; providerSlug:string; serviceSource:'DIGITAL_STEP'|'VERIFIED_PROVIDER'; packages:OrderCatalogPackage[] }
+export interface OrderCatalogService { id:string; slug:string; title:Record<CatalogLocale,string>; providerName:string; providerSlug:string; serviceSource:'DIGITAL_STEP'|'VERIFIED_PROVIDER'; status?:'ACTIVE'|'ARCHIVED'; packages:OrderCatalogPackage[] }
 const l=(ka:string,en:string)=>({ka,en})
 const features=[l('კონტენტის გეგმა','Content plan'),l('მორგებული დიზაინი','Custom design'),l('ტექსტების მომზადება','Copywriting'),l('ანგარიშგება','Reporting')]
 const sources=[
@@ -12,4 +12,4 @@ export const orderCatalog:OrderCatalogService[]=sources.map(([id,slug,ka,en,prov
  {id:'standard',name:l('სტანდარტი','Standard'),priceMinor:Math.round(base*1.7)*100,deliveryDays:7,features:features.slice(0,3)},
  {id:'premium',name:l('პრემიუმი','Premium'),priceMinor:Math.round(base*2.8)*100,deliveryDays:10,features},
 ]}))
-export const findOrderService=(slug:string)=>orderCatalog.find(service=>service.slug===slug)
+export const findOrderService=(slug:string)=>orderCatalog.find(service=>service.slug===slug&&service.status!=='ARCHIVED')

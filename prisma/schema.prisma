@@ -350,3 +350,21 @@ model Message {
   @@index([conversationId, createdAt])
   @@index([conversationId, readAt])
 }
+
+/// Mutable business metadata for the code-owned marketplace catalog. The
+/// immutable catalog id/source remain in code; administrators can only store
+/// an explicit, validated presentation/status override here.
+model CatalogServiceOverride {
+  serviceId       String   @id
+  titleKa         String
+  titleEn         String
+  descriptionKa   String
+  descriptionEn   String
+  category        String
+  priceMinor      Int
+  deliveryDays    Int
+  status          String   @default("ACTIVE")
+  packages        Json?
+  updatedAt       DateTime @updatedAt
+  updatedByUserId String
+}

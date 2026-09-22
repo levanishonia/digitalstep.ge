@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { MarketplaceShell } from './components/MarketplaceShell'
 import { resolveLocale } from './i18n'
 import { AuthLayout } from './components/auth/AuthLayout'
@@ -22,10 +22,14 @@ import { AdminLayout } from './components/admin/AdminLayout'
 import { AdminAIUsage, AdminOrders, AdminOverview, AdminProviders, AdminServices, AdminSubscriptions, AdminUsers } from './components/admin/AdminPages'
 import { NotFoundPage } from './components/NotFoundPage'
 import { locales, localePath } from './i18n'
+import { loadCatalogOverrides } from './lib/catalogOverrides'
 
 export function App() {
+  const [catalogReady,setCatalogReady]=useState(false)
   const locale = resolveLocale(window.location.pathname)
   useEffect(() => { document.documentElement.lang = locale }, [locale])
+  useEffect(()=>{loadCatalogOverrides().catch(()=>undefined).finally(()=>setCatalogReady(true))},[])
+  if(!catalogReady)return <main className="main-content" aria-busy="true" aria-live="polite">{locale==='ka'?'იტვირთება…':'Loading…'}</main>
   const allSegments=window.location.pathname.split('/').filter(Boolean)
   if (!locales.includes(allSegments[0] as 'ka' | 'en')) {
     window.location.replace(localePath('ka', `${window.location.pathname}${window.location.search}${window.location.hash}`))
