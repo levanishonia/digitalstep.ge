@@ -374,6 +374,28 @@ model CatalogServiceOverride {
   packages        Json?
   updatedAt       DateTime      @updatedAt
   updatedByUserId String
+  media           ServiceMedia[]
+}
+
+enum ServiceMediaType {
+  IMAGE
+  VIDEO
+}
+
+model ServiceMedia {
+  id        String           @id @default(cuid())
+  serviceId String
+  service   CatalogServiceOverride @relation(fields: [serviceId], references: [serviceId], onDelete: Cascade)
+  type      ServiceMediaType
+  url       String
+  publicId  String           @unique
+  width     Int?
+  height    Int?
+  duration  Float?
+  sortOrder Int              @default(0)
+  createdAt DateTime         @default(now())
+
+  @@index([serviceId, sortOrder])
 }
 
 enum ServiceStatus {
