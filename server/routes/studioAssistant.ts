@@ -10,6 +10,7 @@ import { openAIProvider } from '../ai/openAIProvider.js'
 import { buildBusinessContext, type BusinessProfile } from '../../shared/businessProfile.js'
 import { canUseFeature, getUsageLimit, type SubscriptionPlan } from '../../shared/subscriptions.js'
 import { logPrismaError } from '../lib/logPrismaError.js'
+import { notifyAIUsageThreshold } from '../lib/notifications.js'
 
 export const studioAssistantRouter = Router()
 studioAssistantRouter.use(requireAuth)
@@ -91,7 +92,9 @@ studioAssistantRouter.post('/assistant/chat', limiter, async (req, res) => {
       await tx.aIUsage.update({ where: { userId_feature_periodKey: { userId, feature: 'AI_ASSISTANT', periodKey: reservation.periodKey } }, data: { requestCount: { increment: 1 } } })
       return created
     })
-    return res.json({ data: { conversation: { id: conversation.id, title: conversation.title }, userMessage, assistantMessage, usage: await usage(userId, access.subscriptionPlan) } })
+    const currentUsage = await usage(userId, access.subscriptionPlan)
+    void notifyAIUsageThreshold({ userId, feature: 'AI_ASSISTANT', period: currentUsage.period, used: currentUsage.used, limit: currentUsage.limit })
+    return res.json({ data: { conversation: { id: conversation.id, title: conversation.title }, userMessage, assistantMessage, usage: currentUsage } })
   } catch (error) {
     await release(reservation.id, userId).catch(() => undefined)
     const code = error instanceof AIProviderError ? error.kind === 'NOT_CONFIGURED' ? 'AI_NOT_CONFIGURED' : error.kind === 'RATE_LIMITED' ? 'RATE_LIMITED' : 'AI_PROVIDER_ERROR' : 'INTERNAL_ERROR'

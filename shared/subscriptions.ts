@@ -16,7 +16,7 @@ export interface PlanDefinition {
 /** Product and enforcement policy shared by the API and UI. Billing is intentionally unavailable. */
 export const billingEnabled = false
 export const planDefinitions: Record<SubscriptionPlan, PlanDefinition> = {
-  FREE: { id:'FREE', descriptionKey:'free', highlighted:false, billingProductKey:null, features:['AI_ASSISTANT','POST_GENERATOR','CONTENT_CALENDAR','CONTENT_IDEAS'], limits:{AI_REQUESTS:10,POST_GENERATIONS:3,CONTENT_IDEA_GENERATIONS:3,MARKETING_PLAN_GENERATIONS:0,BUSINESS_ANALYSIS_GENERATIONS:0} },
+  FREE: { id:'FREE', descriptionKey:'free', highlighted:false, billingProductKey:null, features:['AI_ASSISTANT'], limits:{AI_REQUESTS:10,POST_GENERATIONS:0,CONTENT_IDEA_GENERATIONS:0,MARKETING_PLAN_GENERATIONS:0,BUSINESS_ANALYSIS_GENERATIONS:0} },
   PRO: { id:'PRO', descriptionKey:'pro', highlighted:true, billingProductKey:'pro', features:['AI_ASSISTANT','POST_GENERATOR','CONTENT_CALENDAR','CONTENT_IDEAS','MARKETING_PLANNER'], limits:{AI_REQUESTS:100,POST_GENERATIONS:30,CONTENT_IDEA_GENERATIONS:30,MARKETING_PLAN_GENERATIONS:10,BUSINESS_ANALYSIS_GENERATIONS:0} },
   BUSINESS: { id:'BUSINESS', descriptionKey:'business', highlighted:false, billingProductKey:'business', features:[...studioFeatures], limits:{AI_REQUESTS:500,POST_GENERATIONS:100,CONTENT_IDEA_GENERATIONS:100,MARKETING_PLAN_GENERATIONS:30,BUSINESS_ANALYSIS_GENERATIONS:20} },
 }
