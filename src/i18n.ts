@@ -28,9 +28,13 @@ export const dictionary = {
 export function resolveLocale(pathname: string): Locale { return pathname.split('/')[1] === 'en' ? 'en' : 'ka' }
 export function localePath(locale: Locale, destination: string): string {
   if (destination.startsWith('#')) return destination
-  const [pathAndQuery, hash = ''] = destination.split('#')
-  const [rawPath, query = ''] = pathAndQuery.split('?')
+  const hashIndex = destination.indexOf('#')
+  const pathAndQuery = hashIndex === -1 ? destination : destination.slice(0, hashIndex)
+  const hash = hashIndex === -1 ? '' : destination.slice(hashIndex + 1)
+  const queryIndex = pathAndQuery.indexOf('?')
+  const rawPath = queryIndex === -1 ? pathAndQuery : pathAndQuery.slice(0, queryIndex)
+  const query = queryIndex === -1 ? '' : pathAndQuery.slice(queryIndex + 1)
   const absolutePath = rawPath.startsWith('/') ? rawPath : `/${rawPath}`
   const clean = absolutePath.replace(/^\/(ka|en)(?=\/|$)/, '').replace(/\/{2,}/g, '/')
-  return `/${locale}${clean === '/' ? '' : clean}${query ? `?${query}` : ''}${hash ? `#${hash}` : ''}`
+  return `/${locale}${clean === '/' ? '' : clean}${queryIndex === -1 ? '' : `?${query}`}${hashIndex === -1 ? '' : `#${hash}`}`
 }

@@ -96,7 +96,7 @@ export function ProviderLayout({ locale, children }: { locale: Locale; children:
           <div className="dashboard-mobile-brand"><Logo href={localePath(locale, '/')} /></div>
           <strong>{c.nav}</strong>
           <NotificationCenter locale={locale}/>
-          <a className="language-switch" href={localePath(locale === 'ka' ? 'en' : 'ka', path)}>
+          <a className="language-switch" href={localePath(locale === 'ka' ? 'en' : 'ka', `${path}${window.location.search}${window.location.hash}`)}>
             {locale === 'ka' ? 'English' : 'ქართული'}
           </a>
           <div className="dashboard-account">
