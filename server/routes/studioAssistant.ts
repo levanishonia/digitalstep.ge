@@ -11,6 +11,7 @@ import { buildBusinessContext, type BusinessProfile } from '../../shared/busines
 import { canUseFeature, getUsageLimit, type SubscriptionPlan } from '../../shared/subscriptions.js'
 import { logPrismaError } from '../lib/logPrismaError.js'
 import { notifyAIUsageThreshold } from '../lib/notifications.js'
+import { resolveEffectivePlan, subscriptionUserSelect } from '../billing/subscriptionService.js'
 
 export const studioAssistantRouter = Router()
 studioAssistantRouter.use(requireAuth)
@@ -21,7 +22,8 @@ const idSchema = z.string().cuid()
 const limiter = rateLimit({ windowMs: 60_000, limit: 12, standardHeaders: true, legacyHeaders: false, handler: (_req, res) => res.status(429).json({ error: { code: 'RATE_LIMITED' } }) })
 
 async function userAccess(userId: string) {
-  return prisma.user.findUnique({ where: { id: userId }, select: { subscriptionPlan: true, businessProfile: true } })
+  const user=await prisma.user.findUnique({ where: { id: userId }, select: { ...subscriptionUserSelect, businessProfile: true } })
+  return user?{...user,subscriptionPlan:resolveEffectivePlan(user).plan}:null
 }
 async function usage(userId: string, plan: SubscriptionPlan) {
   const period = periodKey(), limit = getUsageLimit(plan, 'AI_REQUESTS')

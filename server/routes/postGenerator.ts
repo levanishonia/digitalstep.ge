@@ -12,12 +12,13 @@ import {buildBusinessContext,type BusinessProfile} from '../../shared/businessPr
 import {postLanguages,postObjectives,postPlatforms,postTones,type PostGenerationInput,type PostGenerationOutput} from '../../shared/postGenerator.js'
 import {canUseFeature,getUsageLimit} from '../../shared/subscriptions.js'
 import {requireStudioFeature} from '../middleware/studioEntitlement.js'
+import {resolveEffectivePlan,subscriptionUserSelect} from '../billing/subscriptionService.js'
 
 export const postGeneratorRouter=Router();postGeneratorRouter.use(requireAuth,requireStudioFeature('POST_GENERATOR'))
 const service=new AIService(openAIProvider),periodKey=()=>new Date().toISOString().slice(0,7)
 const requestSchema=z.object({platform:z.enum(postPlatforms),objective:z.enum(postObjectives),language:z.enum(postLanguages),tone:z.enum(postTones),topic:z.string().trim().min(2).max(500),keyMessage:z.string().trim().max(1000).optional(),offer:z.string().trim().max(500).optional(),callToAction:z.string().trim().max(300).optional(),customInstructions:z.string().trim().max(1000).optional(),variationCount:z.union([z.literal(1),z.literal(2),z.literal(3)])}).strict()
 const id=z.string().cuid(),limiter=rateLimit({windowMs:60_000,limit:8,standardHeaders:true,legacyHeaders:false,handler:(_q,r)=>r.status(429).json({error:{code:'RATE_LIMITED'}})})
-async function access(userId:string){return prisma.user.findUnique({where:{id:userId},select:{subscriptionPlan:true,businessProfile:true}})}
+async function access(userId:string){const user=await prisma.user.findUnique({where:{id:userId},select:{...subscriptionUserSelect,businessProfile:true}});return user?{...user,subscriptionPlan:resolveEffectivePlan(user).plan}:null}
 async function usage(userId:string,plan:'FREE'|'PRO'|'BUSINESS'){const period=periodKey(),limit=getUsageLimit(plan,'POST_GENERATIONS'),row=await prisma.aIUsage.findUnique({where:{userId_feature_periodKey:{userId,feature:'POST_GENERATOR',periodKey:period}}});return {plan,feature:'POST_GENERATOR',used:row?.requestCount??0,limit,remaining:Math.max(0,limit-(row?.requestCount??0)),period}}
 async function reserve(userId:string,limit:number){const period=periodKey();return prisma.$transaction(async tx=>{await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`${userId}:POST_GENERATOR:${period}`}, 0))`;await tx.aIUsageReservation.deleteMany({where:{expiresAt:{lte:new Date()}}});const row=await tx.aIUsage.upsert({where:{userId_feature_periodKey:{userId,feature:'POST_GENERATOR',periodKey:period}},create:{userId,feature:'POST_GENERATOR',periodKey:period},update:{}});const active=await tx.aIUsageReservation.count({where:{userId,feature:'POST_GENERATOR',periodKey:period,expiresAt:{gt:new Date()}}});if(row.requestCount+active>=limit)return null;return tx.aIUsageReservation.create({data:{userId,feature:'POST_GENERATOR',periodKey:period,expiresAt:new Date(Date.now()+aiConfig.reservationLeaseMs)},select:{id:true,periodKey:true}})})}
 

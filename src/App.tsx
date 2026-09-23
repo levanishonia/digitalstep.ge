@@ -56,5 +56,8 @@ export function App() {
   }
   if(segments[0]==='business'&&segments.length===1)return <RequireAuth locale={locale}><DashboardLayout locale={locale}><BusinessPage locale={locale}/></DashboardLayout></RequireAuth>
   if(segments[0]==='pricing'&&segments.length===1)return <RequireAuth locale={locale}><DashboardLayout locale={locale}><PricingPage locale={locale}/></DashboardLayout></RequireAuth>
+  if(segments[0]==='billing'&&['success','cancel'].includes(segments[1])&&segments.length===2)return <BillingReturnPage locale={locale} outcome={segments[1] as 'success'|'cancel'}/>
   return <MarketplaceShell locale={locale} />
 }
+
+function BillingReturnPage({locale,outcome}:{locale:'ka'|'en';outcome:'success'|'cancel'}){const success=outcome==='success';return <main className="billing-return"><h1>{success?(locale==='ka'?'გადახდის სტატუსი':'Payment status'):(locale==='ka'?'გადახდა გაუქმდა':'Payment cancelled')}</h1><p>{success?(locale==='ka'?'გამოწერა გააქტიურდება მხოლოდ გადახდის სისტემის მიერ დადასტურების შემდეგ.':'Your subscription activates only after verified confirmation from the payment provider.'):(locale==='ka'?'გეგმა არ შეცვლილა.':'Your plan has not changed.')}</p><a href={localePath(locale,'/pricing')}>{locale==='ka'?'ფასებზე დაბრუნება':'Back to Pricing'}</a></main>}

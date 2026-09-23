@@ -25,6 +25,14 @@ enum SubscriptionPlan {
   BUSINESS
 }
 
+enum SubscriptionStatus {
+  ACTIVE
+  INCOMPLETE
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+}
+
 enum BusinessGoal {
   INCREASE_SALES
   ACQUIRE_CUSTOMERS
@@ -72,33 +80,55 @@ enum NotificationType {
 }
 
 model User {
-  id                    String               @id @default(cuid())
-  email                 String               @unique
-  passwordHash          String
-  firstName             String
-  lastName              String
-  phone                 String?
-  role                  UserRole             @default(CUSTOMER)
-  preferredLocale       String               @default("ka")
-  termsAcceptedAt       DateTime
-  createdAt             DateTime             @default(now())
-  updatedAt             DateTime             @updatedAt
-  orders                Order[]              @relation("CustomerOrders")
-  providerSlug          String?              @unique
-  assignedOrders        Order[]              @relation("ProviderOrders")
-  providerStatus        ProviderStatus       @default(PENDING)
-  providerProfile       ProviderProfile?
-  subscriptionPlan      SubscriptionPlan     @default(FREE)
-  businessProfile       BusinessProfile?
-  aiConversations       AIConversation[]
-  aiUsage               AIUsage[]
-  aiReservations        AIUsageReservation[]
-  aiGenerations         AIGeneration[]
-  contentItems          ContentItem[]
-  customerConversations Conversation[]       @relation("ConversationCustomer")
-  providerConversations Conversation[]       @relation("ConversationProvider")
-  sentMessages          Message[]            @relation("MessageSender")
-  notifications         Notification[]
+  id                          String               @id @default(cuid())
+  email                       String               @unique
+  passwordHash                String
+  firstName                   String
+  lastName                    String
+  phone                       String?
+  role                        UserRole             @default(CUSTOMER)
+  preferredLocale             String               @default("ka")
+  termsAcceptedAt             DateTime
+  createdAt                   DateTime             @default(now())
+  updatedAt                   DateTime             @updatedAt
+  orders                      Order[]              @relation("CustomerOrders")
+  providerSlug                String?              @unique
+  assignedOrders              Order[]              @relation("ProviderOrders")
+  providerStatus              ProviderStatus       @default(PENDING)
+  providerProfile             ProviderProfile?
+  subscriptionPlan            SubscriptionPlan     @default(FREE)
+  manualPlanOverride          SubscriptionPlan?
+  manualPlanOverrideExpiresAt DateTime?
+  subscription                Subscription?
+  businessProfile             BusinessProfile?
+  aiConversations             AIConversation[]
+  aiUsage                     AIUsage[]
+  aiReservations              AIUsageReservation[]
+  aiGenerations               AIGeneration[]
+  contentItems                ContentItem[]
+  customerConversations       Conversation[]       @relation("ConversationCustomer")
+  providerConversations       Conversation[]       @relation("ConversationProvider")
+  sentMessages                Message[]            @relation("MessageSender")
+  notifications               Notification[]
+}
+
+/// SaaS billing state. Marketplace order payments intentionally use Order.paymentStatus.
+model Subscription {
+  id                     String             @id @default(cuid())
+  userId                 String             @unique
+  user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                   SubscriptionPlan
+  status                 SubscriptionStatus
+  billingProvider        String
+  externalCustomerId     String?
+  externalSubscriptionId String?            @unique
+  currentPeriodStart     DateTime?
+  currentPeriodEnd       DateTime?
+  cancelAtPeriodEnd      Boolean            @default(false)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  @@index([status, currentPeriodEnd])
 }
 
 model Notification {
@@ -356,7 +386,7 @@ model Message {
 /// immutable catalog id/source remain in code; administrators can only store
 /// an explicit, validated presentation/status override here.
 model CatalogServiceOverride {
-  serviceId       String        @id
+  serviceId       String         @id
   titleKa         String
   titleEn         String
   descriptionKa   String
@@ -364,15 +394,15 @@ model CatalogServiceOverride {
   category        String
   priceMinor      Int
   deliveryDays    Int
-  status          ServiceStatus @default(ACTIVE)
+  status          ServiceStatus  @default(ACTIVE)
   /// Custom rows are administrator-created official services. Code-owned rows
   /// remain protected presentation overrides.
-  isCustom        Boolean       @default(false)
-  statusOnly      Boolean       @default(false)
-  slug            String?       @unique
-  serviceSource   ServiceSource @default(DIGITAL_STEP)
+  isCustom        Boolean        @default(false)
+  statusOnly      Boolean        @default(false)
+  slug            String?        @unique
+  serviceSource   ServiceSource  @default(DIGITAL_STEP)
   packages        Json?
-  updatedAt       DateTime      @updatedAt
+  updatedAt       DateTime       @updatedAt
   updatedByUserId String
   media           ServiceMedia[]
 }
@@ -383,17 +413,17 @@ enum ServiceMediaType {
 }
 
 model ServiceMedia {
-  id        String           @id @default(cuid())
+  id        String                 @id @default(cuid())
   serviceId String
   service   CatalogServiceOverride @relation(fields: [serviceId], references: [serviceId], onDelete: Cascade)
   type      ServiceMediaType
   url       String
-  publicId  String           @unique
+  publicId  String                 @unique
   width     Int?
   height    Int?
   duration  Float?
-  sortOrder Int              @default(0)
-  createdAt DateTime         @default(now())
+  sortOrder Int                    @default(0)
+  createdAt DateTime               @default(now())
 
   @@index([serviceId, sortOrder])
 }
