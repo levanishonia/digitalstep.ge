@@ -3,7 +3,7 @@ import { catalogServices } from './marketplace'
 
 export type PackageTier='basic'|'standard'|'premium'
 export interface ServicePackage { id:PackageTier; price:number; deliveryDays:number; revisions:number; description:Localized; features:Localized[] }
-export interface GalleryItem { id:string; label:Localized; tone:string; video?:boolean }
+export interface GalleryItem { id:string; label:Localized; tone:string; video?:boolean; url?:string }
 export interface Review { id:string; author:string; rating:number; date:string; text:Localized; package:PackageTier }
 export interface Faq { id:string; question:Localized; answer:Localized }
 export interface ServiceDetail { serviceId:string; providerSlug:string; longDescription:Localized; gallery:GalleryItem[]; packages:ServicePackage[]; included:Localized[]; process:Localized[]; reviews:Review[]; faq:Faq[]; relatedIds:string[] }

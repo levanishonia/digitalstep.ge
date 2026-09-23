@@ -3,7 +3,7 @@ import { serviceDetails } from '../data/serviceDetails'
 import { orderCatalog } from '../../shared/orderCatalog'
 
 interface PackageOverride { nameKa:string;nameEn:string;descriptionKa?:string;descriptionEn?:string;priceMinor:number;deliveryDays:number;featuresKa:string[];featuresEn:string[] }
-interface CatalogOverride { serviceId:string;titleKa:string;titleEn:string;descriptionKa:string;descriptionEn:string;category:string;priceMinor:number;deliveryDays:number;status:'ACTIVE'|'ARCHIVED';packages:PackageOverride[]|null;isCustom:boolean;statusOnly:boolean;slug:string|null;serviceSource:'DIGITAL_STEP'|'VERIFIED_PROVIDER' }
+interface CatalogOverride { serviceId:string;titleKa:string;titleEn:string;descriptionKa:string;descriptionEn:string;category:string;priceMinor:number;deliveryDays:number;status:'ACTIVE'|'ARCHIVED';packages:PackageOverride[]|null;isCustom:boolean;statusOnly:boolean;slug:string|null;serviceSource:'DIGITAL_STEP'|'VERIFIED_PROVIDER';media:{id:string;type:'IMAGE'|'VIDEO';url:string;width?:number|null;height?:number|null;duration?:number|null;sortOrder:number}[] }
 
 let loaded: Promise<void> | undefined
 
@@ -27,6 +27,8 @@ export function loadCatalogOverrides() {
           catalogServices.push(service);serviceDetails.push(detail);orderCatalog.push(orderService)
         }
         if(!service||!detail||!orderService)continue
+        service.media=override.media
+        if(override.media.length)detail.gallery=override.media.map(item=>({id:item.id,label:{ka:item.type==='IMAGE'?'სერვისის სურათი':'სერვისის ვიდეო',en:item.type==='IMAGE'?'Service image':'Service video'},tone:'media',video:item.type==='VIDEO',url:item.url}))
         if(!override.statusOnly)Object.assign(service,{title:{ka:override.titleKa,en:override.titleEn},description:{ka:override.descriptionKa,en:override.descriptionEn},category:override.category,price:override.priceMinor/100,deliveryDays:override.deliveryDays,status:override.status})
         else Object.assign(service,{status:override.status})
         Object.assign(orderService,{...(override.statusOnly?{}:{title:{ka:override.titleKa,en:override.titleEn}}),status:override.status})

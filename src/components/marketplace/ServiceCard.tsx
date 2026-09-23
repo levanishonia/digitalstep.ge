@@ -11,9 +11,9 @@ export function ServiceSourceBadge({service,locale,className=''}:{service:Servic
  return <span className={`source-badge ${official?'official':''} ${className}`.trim()}>{official?<Sparkles aria-hidden="true"/>:<BadgeCheck aria-hidden="true"/>}{official?t.trust.digitalStep:t.trust.verified}</span>
 }
 export function ServiceCard({service,locale}:{service:Service;locale:Locale}) {
- const favorite=useFavorites().includes(service.id); const t=dictionary[locale]
+ const favorite=useFavorites().includes(service.id); const t=dictionary[locale],image=service.media?.find(item=>item.type==='IMAGE')
  return <article className="service-card">
-  <div className={`service-preview preview-${service.preview}`} aria-hidden="true"><span/><span/><span/></div>
+  {image?<img className="service-preview service-media-image" src={image.url.replace('/upload/','/upload/f_auto,q_auto,w_640,c_fill/')} alt="" loading="lazy"/>:<div className={`service-preview preview-${service.preview}`} aria-hidden="true"><span/><span/><span/></div>}
   <div className="service-badges">{service.badges.slice(0,2).map(b=><span key={b}>{t.badges[b]}</span>)}</div>
   <ServiceSourceBadge service={service} locale={locale}/>
   <button className="favorite" type="button" aria-pressed={favorite} aria-label={favorite?t.home.removeFavorite:t.home.addFavorite} onClick={()=>toggleFavorite(service.id)}><Heart fill={favorite?'currentColor':'none'} aria-hidden="true"/></button>
