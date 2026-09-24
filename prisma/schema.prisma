@@ -91,6 +91,8 @@ model User {
   termsAcceptedAt             DateTime
   createdAt                   DateTime             @default(now())
   updatedAt                   DateTime             @updatedAt
+  emailVerifiedAt             DateTime?
+  emailVerificationCodes      EmailVerificationCode[]
   orders                      Order[]              @relation("CustomerOrders")
   providerSlug                String?              @unique
   assignedOrders              Order[]              @relation("ProviderOrders")
@@ -110,6 +112,21 @@ model User {
   providerConversations       Conversation[]       @relation("ConversationProvider")
   sentMessages                Message[]            @relation("MessageSender")
   notifications               Notification[]
+}
+
+model EmailVerificationCode {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash           String
+  expiresAt          DateTime
+  resendAvailableAt DateTime
+  attempts           Int      @default(0)
+  usedAt             DateTime?
+  createdAt          DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([expiresAt])
 }
 
 /// SaaS billing state. Marketplace order payments intentionally use Order.paymentStatus.

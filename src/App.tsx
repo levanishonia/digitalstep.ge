@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { MarketplaceShell } from './components/MarketplaceShell'
 import { resolveLocale } from './i18n'
 import { AuthLayout } from './components/auth/AuthLayout'
-import { ForgotPasswordPage, LoginPage, RegisterPage } from './components/auth/AuthPages'
+import { ForgotPasswordPage, LoginPage, RegisterPage, VerifyEmailPage } from './components/auth/AuthPages'
 import { DashboardLayout } from './components/dashboard/DashboardLayout'
 import { DashboardOverview, OrderDetailPage, OrdersPage, ProfilePage } from './components/dashboard/DashboardPages'
 import { FavoritesPlaceholder, SettingsPage } from './components/dashboard/SettingsPage'
@@ -36,7 +36,7 @@ export function App() {
     return null
   }
   const segments=allSegments.slice(1)
-  const authPage=segments[0]==='login'?<LoginPage locale={locale}/>:segments[0]==='register'?<RegisterPage locale={locale}/>:segments[0]==='forgot-password'?<ForgotPasswordPage locale={locale}/>:null
+  const authPage=segments[0]==='login'?<LoginPage locale={locale}/>:segments[0]==='register'?<RegisterPage locale={locale}/>:segments[0]==='forgot-password'?<ForgotPasswordPage locale={locale}/>:segments[0]==='verify-email'?<VerifyEmailPage locale={locale}/>:null
   if(authPage&&segments.length===1)return <AuthLayout locale={locale}>{authPage}</AuthLayout>
   if(segments[0]==='admin'){
     const page=segments.length===1?<AdminOverview locale={locale}/>:segments.length===2&&segments[1]==='users'?<AdminUsers locale={locale}/>:segments.length===2&&segments[1]==='providers'?<AdminProviders locale={locale}/>:segments.length===2&&segments[1]==='services'?<AdminServices locale={locale}/>:segments.length===2&&segments[1]==='orders'?<AdminOrders locale={locale}/>:segments.length===2&&segments[1]==='subscriptions'?<AdminSubscriptions locale={locale}/>:segments.length===2&&segments[1]==='ai-usage'?<AdminAIUsage locale={locale}/>:<NotFoundPage locale={locale}/>
