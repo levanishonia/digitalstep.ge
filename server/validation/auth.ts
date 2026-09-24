@@ -23,3 +23,4 @@ export const updateProfileSchema = z.object({
 }).strict().refine(value => Object.keys(value).length > 0)
 
 export const changePasswordSchema = z.object({ currentPassword: passwordSchema, newPassword: passwordSchema }).strict()
+export const verifyEmailSchema = z.object({ code: z.string().regex(/^\d{6}$/) }).strict()

@@ -44,7 +44,7 @@ adminRouter.get('/users', async (request, response, next) => {
   try {
     const {page,pageSize,search,role,plan}=parsed.data
     const where={...(role&&{role}),...(search&&{OR:[{email:{contains:search,mode:'insensitive' as const}},{firstName:{contains:search,mode:'insensitive' as const}},{lastName:{contains:search,mode:'insensitive' as const}}]})}
-    const select={id:true,firstName:true,lastName:true,phone:true,email:true,role:true,providerStatus:true,createdAt:true,providerProfile:{select:{displayName:true}},_count:{select:{orders:true,aiUsage:true}},...subscriptionUserSelect} as const
+    const select={id:true,firstName:true,lastName:true,phone:true,email:true,emailVerifiedAt:true,role:true,providerStatus:true,createdAt:true,providerProfile:{select:{displayName:true}},_count:{select:{orders:true,aiUsage:true}},...subscriptionUserSelect} as const
     // Effective plan is derived from override/subscription state, so a plan filter
     // cannot safely target the legacy subscriptionPlan column.
     if(plan){

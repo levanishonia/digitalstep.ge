@@ -429,3 +429,4 @@ html[lang="ka"] :where(.eyebrow,.market-eyebrow,.section-eyebrow,.catalog-eyebro
   .category-card { padding: 14px; }
   .bottom-navigation small,.dashboard-mobile-nav small,.dashboard-mobile-nav span { font-size: 10px; }
 }
+.verify-form>label{font-size:13px;font-weight:650}.verification-code{width:100%;height:68px;padding:0 12px;color:#fff;background:var(--elevated);border:1px solid var(--border);border-radius:13px;text-align:center;font-size:clamp(25px,8vw,34px);font-weight:750;letter-spacing:clamp(5px,2vw,10px);font-variant-numeric:tabular-nums}.verification-code:focus{border-color:var(--primary);outline:none}.verify-resend{min-height:44px;border:0;background:transparent;color:#aeb5ff;font-weight:650;cursor:pointer}.verify-resend:disabled{color:var(--muted);cursor:not-allowed}

@@ -3,18 +3,24 @@ import type { UserRole } from '@prisma/client'
 import { prisma } from '../lib/prisma.js'
 import { readSession, SESSION_COOKIE } from '../lib/session.js'
 
-export async function requireAuth(request: Request, response: Response, next: NextFunction) {
+export async function requireSession(request: Request, response: Response, next: NextFunction) {
   try {
     const token = request.cookies?.[SESSION_COOKIE]
     if (!token) return response.status(401).json({ error: { code: 'UNAUTHENTICATED' } })
     const userId = await readSession(token)
-    const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { id: true, role: true } }) : null
+    const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { id: true, role: true, emailVerifiedAt: true } }) : null
     if (!user) return response.status(401).json({ error: { code: 'UNAUTHENTICATED' } })
-    request.auth = { userId: user.id, role: user.role }
+    request.auth = { userId: user.id, role: user.role, emailVerified: Boolean(user.emailVerifiedAt) }
     next()
   } catch {
     return response.status(401).json({ error: { code: 'UNAUTHENTICATED' } })
   }
+}
+
+export function requireAuth(request: Request, response: Response, next: NextFunction) {
+  return requireSession(request, response, () => request.auth?.emailVerified
+    ? next()
+    : response.status(403).json({ error: { code: 'EMAIL_NOT_VERIFIED' } }))
 }
 
 export const requireRole = (...roles: UserRole[]) => (request: Request, response: Response, next: NextFunction) =>
