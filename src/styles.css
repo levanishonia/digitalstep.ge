@@ -377,7 +377,8 @@ html[lang="ka"] :where(.eyebrow,.market-eyebrow,.section-eyebrow,.catalog-eyebro
   .mobile-header,.dashboard-header { min-height: 64px; }
   .dashboard-mobile-nav,.bottom-navigation { z-index: 40; min-height: calc(64px + env(safe-area-inset-bottom)); }
   .messaging-layout { min-height: 0; height: calc(100dvh - 184px); }
-  .messages-page.has-selection .messaging-layout { height: calc(100dvh - 96px - env(safe-area-inset-bottom)); }
+  /* 68px shell header + 64px bottom navigation + 22px content gutters. */
+  .messages-page.has-selection .messaging-layout { height: calc(100dvh - 154px - env(safe-area-inset-bottom)); }
   .chat-panel,.conversation-list-panel { min-height: 0; }
   .ai-chat { height: calc(100dvh - 210px); min-height: 420px; }
   .admin-table-wrap { scrollbar-width: thin; }
