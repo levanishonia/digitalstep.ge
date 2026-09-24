@@ -2,7 +2,7 @@ import type { Locale } from '../../i18n'
 
 export type UserRole = 'CUSTOMER' | 'PROVIDER' | 'ADMIN'
 export interface AuthUser { id:string; firstName:string; lastName:string; email:string; emailVerifiedAt:string; phone:string|null; role:UserRole; preferredLocale:Locale; providerSlug:string|null; providerStatus:'PENDING'|'VERIFIED'|'SUSPENDED'; subscriptionPlan:'FREE'|'PRO'|'BUSINESS' }
-export type PendingVerification={requiresVerification:true;email:string;retryAfter:number}
+export type PendingVerification={requiresVerification:true;email:string;retryAfter:number;deliveryFailed?:boolean}
 export type AuthResult={user:AuthUser;requiresVerification:false}|PendingVerification
 export type ApiErrorCode = 'INVALID_CREDENTIALS'|'EMAIL_ALREADY_EXISTS'|'VALIDATION_ERROR'|'CURRENT_PASSWORD_INCORRECT'|'NEW_PASSWORD_SAME_AS_CURRENT'|'PAYLOAD_TOO_LARGE'|'UNAUTHENTICATED'|'FORBIDDEN'|'EMAIL_NOT_VERIFIED'|'VERIFICATION_SEND_FAILED'|'VERIFICATION_CODE_INVALID'|'VERIFICATION_CODE_EXPIRED'|'VERIFICATION_TOO_MANY_ATTEMPTS'|'VERIFICATION_RESEND_TOO_SOON'|'INTERNAL_ERROR'|'RATE_LIMITED'|'NETWORK_ERROR'
 export class AuthApiError extends Error { constructor(public code:ApiErrorCode,public retryAfter?:number) { super(code) } }

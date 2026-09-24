@@ -17,7 +17,7 @@ const resendLimiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 8, standardHe
 const safeUser = { id: true, firstName: true, lastName: true, email: true, emailVerifiedAt: true, phone: true, role: true, preferredLocale: true, providerSlug: true, providerStatus: true, ...subscriptionUserSelect } as const
 type SafeUser=Prisma.UserGetPayload<{select:typeof safeUser}>
 const withEffectivePlan = (user:SafeUser) => { const {manualPlanOverride:_,manualPlanOverrideExpiresAt:__,subscription:___,...publicUser}=user;void _;void __;void ___;return {...publicUser,subscriptionPlan:resolveEffectivePlan(user).plan} }
-const pendingPayload = (user: { email: string }, retryAfter = verificationCooldownSeconds) => ({ data: { requiresVerification: true, email: user.email.replace(/^(.).+(@.+)$/, '$1***$2'), retryAfter } })
+const pendingPayload = (user: { email: string }, retryAfter = verificationCooldownSeconds, deliveryFailed = false) => ({ data: { requiresVerification: true, email: user.email.replace(/^(.).+(@.+)$/, '$1***$2'), retryAfter, deliveryFailed } })
 
 // Registration creates a restricted session. Every product API uses requireAuth,
 // which upgrades access only after emailVerifiedAt is persisted.
@@ -33,7 +33,9 @@ authRouter.post('/register', authLimiter, async (request, response, next) => {
       const issued = await issueVerificationCode(user, false)
       return response.status(201).json(pendingPayload(user, issued.retryAfter))
     } catch (error) {
-      if (error instanceof EmailProviderError) return response.status(503).json({ error: { code: 'VERIFICATION_SEND_FAILED' } })
+      // The account and restricted session already exist. Return that durable
+      // state instead of inviting a registration retry that can only conflict.
+      if (error instanceof EmailProviderError) return response.status(201).json(pendingPayload(user, 0, true))
       throw error
     }
   } catch (error) {
