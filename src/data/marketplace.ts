@@ -6,8 +6,8 @@ export interface Category { id: string; icon: IconName; name: Localized; descrip
 export type ProviderType = 'agency'|'specialist'|'digitalStep'
 export type ServiceType = 'oneTime'|'monthly'|'consultation'
 export type ServiceSource = 'DIGITAL_STEP'|'VERIFIED_PROVIDER'
-export interface ServiceMedia { id:string;type:'IMAGE'|'VIDEO';url:string;width?:number|null;height?:number|null;duration?:number|null;sortOrder:number }
-export interface Service { id: string; slug: string; title: Localized; description: Localized; provider: string; category: string; rating: number; reviews: number; price: number; deliveryDays: number; providerType: ProviderType; serviceSource:ServiceSource; providerStatus?:'PENDING'|'VERIFIED'|'SUSPENDED'; status?:'ACTIVE'|'ARCHIVED'; serviceType: ServiceType; badges: Badge[]; preview: string; createdOrder: number; media?:ServiceMedia[] }
+export interface ServiceMedia { id:string;type:'IMAGE'|'VIDEO';url:string;width?:number|null;height?:number|null;duration?:number|null;sortOrder:number;isPrimary?:boolean }
+export interface Service { id: string; slug: string; title: Localized; description: Localized; provider: string; category: string; rating: number; reviews: number; price: number; deliveryDays: number; providerType: ProviderType; serviceSource:ServiceSource; providerStatus?:'PENDING'|'VERIFIED'|'SUSPENDED'; status?:'DRAFT'|'PENDING_REVIEW'|'ACTIVE'|'ARCHIVED'; isFeatured?:boolean; isPopular?:boolean; serviceType: ServiceType; badges: Badge[]; preview: string; createdOrder: number; media?:ServiceMedia[] }
 export interface Goal { id: string; icon: IconName; title: Localized; description: Localized }
 export interface Step { id: string; icon: IconName; title: Localized; description: Localized }
 const l = (ka:string,en:string):Localized => ({ka,en})

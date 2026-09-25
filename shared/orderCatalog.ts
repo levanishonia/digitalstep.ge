@@ -1,6 +1,6 @@
 export type CatalogLocale = 'ka' | 'en'
 export interface OrderCatalogPackage { id:'basic'|'standard'|'premium'; name:Record<CatalogLocale,string>; priceMinor:number; deliveryDays:number; features:Record<CatalogLocale,string>[] }
-export interface OrderCatalogService { id:string; slug:string; title:Record<CatalogLocale,string>; providerName:string; providerSlug:string; serviceSource:'DIGITAL_STEP'|'VERIFIED_PROVIDER'; status?:'ACTIVE'|'ARCHIVED'; packages:OrderCatalogPackage[] }
+export interface OrderCatalogService { id:string; slug:string; title:Record<CatalogLocale,string>; providerName:string; providerSlug:string; serviceSource:'DIGITAL_STEP'|'VERIFIED_PROVIDER'; status?:'DRAFT'|'PENDING_REVIEW'|'ACTIVE'|'ARCHIVED'; packages:OrderCatalogPackage[] }
 const l=(ka:string,en:string)=>({ka,en})
 const features=[l('კონტენტის გეგმა','Content plan'),l('მორგებული დიზაინი','Custom design'),l('ტექსტების მომზადება','Copywriting'),l('ანგარიშგება','Reporting')]
 const sources=[

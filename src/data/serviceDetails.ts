@@ -57,8 +57,8 @@ export const providers:Provider[]=providerServices.map(service=>{
  const slug=slugify(service.provider)
  return {id:slug,slug,name:service.provider,type:l('ციფრული სააგენტო','Digital agency'),tagline:l('მკაფიო სტრატეგია, ხარისხიანი შესრულება.','Clear strategy, thoughtful execution.'),description:l('ვქმნით პრაქტიკულ ციფრულ გადაწყვეტილებებს ბიზნესის გაზომვადი მიზნებისთვის. ყველა მონაცემი ამ პროფილზე სადემონსტრაციოა.','We create practical digital solutions for measurable business goals. All profile data shown here is demonstrative.'),location:l('თბილისი, საქართველო','Tbilisi, Georgia'),responseTime:l('დაახლოებით 2 საათი','About 2 hours'),completedProjects:128,specializations:[l('სტრატეგია','Strategy'),l('დიზაინი','Design'),l('ზრდა','Growth')],languages:['ქართული','English'],portfolio:portfolio(service.preview),reviews:reviews(slug)}
 })
-export const getServiceBySlug=(slug:string)=>catalogServices.find(service=>service.slug===slug&&service.status!=='ARCHIVED')
+export const getServiceBySlug=(slug:string)=>catalogServices.find(service=>service.slug===slug&&service.status==='ACTIVE')
 export const getServiceDetail=(serviceId:string)=>serviceDetails.find(detail=>detail.serviceId===serviceId)
 export const getProviderBySlug=(slug:string)=>providers.find(provider=>provider.slug===slug)
-export const getServicesByProvider=(provider:Provider):Service[]=>catalogServices.filter(service=>service.provider===provider.name&&service.status!=='ARCHIVED')
-export const getRelatedServices=(detail:ServiceDetail):Service[]=>detail.relatedIds.map(id=>catalogServices.find(service=>service.id===id&&service.status!=='ARCHIVED')).filter((service):service is Service=>Boolean(service))
+export const getServicesByProvider=(provider:Provider):Service[]=>catalogServices.filter(service=>service.provider===provider.name&&service.status==='ACTIVE')
+export const getRelatedServices=(detail:ServiceDetail):Service[]=>detail.relatedIds.map(id=>catalogServices.find(service=>service.id===id&&service.status==='ACTIVE')).filter((service):service is Service=>Boolean(service))

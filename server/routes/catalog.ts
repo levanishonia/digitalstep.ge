@@ -23,7 +23,9 @@ catalogRouter.get('/overrides', async (_request, response, next) => {
         statusOnly: true,
         slug: true,
         serviceSource: true,
-        media: { orderBy: { sortOrder: 'asc' }, select: { id:true,type:true,url:true,width:true,height:true,duration:true,sortOrder:true } },
+        isFeatured: true,
+        isPopular: true,
+        media: { orderBy: { sortOrder: 'asc' }, select: { id:true,type:true,url:true,width:true,height:true,duration:true,sortOrder:true,isPrimary:true } },
       },
     })
     response.json({ data: { overrides } })
