@@ -9,9 +9,9 @@ export function SearchField({locale}:{locale:Locale}) {
   const searchId = useId()
   const t = dictionary[locale].shell
 
-  const current = window.location.pathname.endsWith('/search') ? new URLSearchParams(window.location.search).get('q') ?? '' : ''
+  const current = /\/(search|marketplace)$/.test(window.location.pathname) ? new URLSearchParams(window.location.search).get('q') ?? '' : ''
   const [query,setQuery]=useState(current)
-  function submit(event:FormEvent) { event.preventDefault(); const clean=query.trim(); window.location.assign(clean?localePath(locale,`/search?q=${encodeURIComponent(clean)}`):localePath(locale,'/marketplace')) }
+  function submit(event:FormEvent) { event.preventDefault(); const clean=query.trim(); window.location.assign(clean?localePath(locale,`/marketplace?q=${encodeURIComponent(clean)}`):localePath(locale,'/marketplace')) }
   return (
     <form className="search" role="search" onSubmit={submit}>
       <Search aria-hidden="true" />
