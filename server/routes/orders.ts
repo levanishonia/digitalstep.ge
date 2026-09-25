@@ -15,7 +15,7 @@ ordersRouter.post('/',async(req,res,next)=>{
  try{
   const staticService=findOrderService(parsed.data.serviceSlug)
   const override=staticService?await prisma.catalogServiceOverride.findUnique({where:{serviceId:staticService.id}}):await prisma.catalogServiceOverride.findFirst({where:{slug:parsed.data.serviceSlug,isCustom:true}})
-  if(override?.status==='ARCHIVED')return res.status(404).json({error:{code:'SERVICE_NOT_FOUND'}})
+  if(override&&override.status!=='ACTIVE')return res.status(404).json({error:{code:'SERVICE_NOT_FOUND'}})
   const storedPackages=Array.isArray(override?.packages)?override.packages as Array<{nameKa:string;nameEn:string;priceMinor:number;deliveryDays:number;featuresKa:string[];featuresEn:string[]}>:null
   let service:OrderCatalogService|undefined=staticService
   if(!service&&override?.isCustom&&override.slug){

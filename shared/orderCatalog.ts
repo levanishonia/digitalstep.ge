@@ -12,4 +12,4 @@ export const orderCatalog:OrderCatalogService[]=sources.map(([id,slug,ka,en,prov
  {id:'standard',name:l('სტანდარტი','Standard'),priceMinor:Math.round(base*1.7)*100,deliveryDays:7,features:features.slice(0,3)},
  {id:'premium',name:l('პრემიუმი','Premium'),priceMinor:Math.round(base*2.8)*100,deliveryDays:10,features},
 ]}))
-export const findOrderService=(slug:string)=>orderCatalog.find(service=>service.slug===slug&&service.status!=='ARCHIVED')
+export const findOrderService=(slug:string)=>orderCatalog.find(service=>service.slug===slug&&(service.status===undefined||service.status==='ACTIVE'))

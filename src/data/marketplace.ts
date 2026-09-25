@@ -8,6 +8,7 @@ export type ServiceType = 'oneTime'|'monthly'|'consultation'
 export type ServiceSource = 'DIGITAL_STEP'|'VERIFIED_PROVIDER'
 export interface ServiceMedia { id:string;type:'IMAGE'|'VIDEO';url:string;width?:number|null;height?:number|null;duration?:number|null;sortOrder:number;isPrimary?:boolean }
 export interface Service { id: string; slug: string; title: Localized; description: Localized; provider: string; category: string; rating: number; reviews: number; price: number; deliveryDays: number; providerType: ProviderType; serviceSource:ServiceSource; providerStatus?:'PENDING'|'VERIFIED'|'SUSPENDED'; status?:'DRAFT'|'PENDING_REVIEW'|'ACTIVE'|'ARCHIVED'; isFeatured?:boolean; isPopular?:boolean; serviceType: ServiceType; badges: Badge[]; preview: string; createdOrder: number; media?:ServiceMedia[] }
+export const isServicePublic=(service:Pick<Service,'status'>)=>service.status===undefined||service.status==='ACTIVE'
 export interface Goal { id: string; icon: IconName; title: Localized; description: Localized }
 export interface Step { id: string; icon: IconName; title: Localized; description: Localized }
 const l = (ka:string,en:string):Localized => ({ka,en})
