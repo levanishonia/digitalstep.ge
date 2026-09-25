@@ -5,6 +5,7 @@ import { requireAuth } from '../middleware/auth.js'
 import { createOrderSchema } from '../validation/orders.js'
 import { findOrderService, type OrderCatalogPackage, type OrderCatalogService } from '../../shared/orderCatalog.js'
 import { createNotification } from '../lib/notifications.js'
+import { normalizeServicePackages } from '../../shared/servicePackages.js'
 export const ordersRouter=Router()
 ordersRouter.use(requireAuth)
 interface StoredOrder{id:string;orderNumber:string;serviceId:string;serviceSlug:string;serviceTitleKa:string;serviceTitleEn:string;serviceSource:'DIGITAL_STEP'|'VERIFIED_PROVIDER';providerSlug:string;providerName:string;packageId:string;packageNameKa:string;packageNameEn:string;priceMinor:number;currency:string;status:string;paymentStatus:string;requirementsText:string;referenceLinks:unknown;deliveryDate:Date;createdAt:Date;updatedAt:Date}
@@ -16,17 +17,17 @@ ordersRouter.post('/',async(req,res,next)=>{
   const staticService=findOrderService(parsed.data.serviceSlug)
   const override=staticService?await prisma.catalogServiceOverride.findUnique({where:{serviceId:staticService.id}}):await prisma.catalogServiceOverride.findFirst({where:{slug:parsed.data.serviceSlug,isCustom:true}})
   if(override&&override.status!=='ACTIVE')return res.status(404).json({error:{code:'SERVICE_NOT_FOUND'}})
-  const storedPackages=Array.isArray(override?.packages)?override.packages as Array<{nameKa:string;nameEn:string;priceMinor:number;deliveryDays:number;featuresKa:string[];featuresEn:string[]}>:null
+  const storedPackages=normalizeServicePackages(override?.packages,override?.priceMinor,override?.deliveryDays)
   let service:OrderCatalogService|undefined=staticService
   if(!service&&override?.isCustom&&override.slug){
-   const packages:OrderCatalogPackage[]=(storedPackages?.length?storedPackages:[{nameKa:'საბაზისო',nameEn:'Basic',priceMinor:override.priceMinor,deliveryDays:override.deliveryDays,featuresKa:['Digital Step მხარდაჭერა'],featuresEn:['Digital Step support']}]).map((pack,index)=>({id:(['basic','standard','premium'][index]??'premium') as OrderCatalogPackage['id'],name:{ka:pack.nameKa,en:pack.nameEn},priceMinor:pack.priceMinor,deliveryDays:pack.deliveryDays,features:pack.featuresKa.map((ka,i)=>({ka,en:pack.featuresEn[i]??ka}))}))
+   const packages:OrderCatalogPackage[]=storedPackages.map(pack=>({id:pack.key,name:{ka:pack.nameKa,en:pack.nameEn},priceMinor:pack.priceMinor,deliveryDays:pack.deliveryDays,features:pack.features.map(feature=>({ka:feature.textKa,en:feature.textEn}))}))
    service={id:override.serviceId,slug:override.slug,title:{ka:override.titleKa,en:override.titleEn},providerName:'Digital Step Team',providerSlug:'digital-step-team',serviceSource:'DIGITAL_STEP',status:override.status,packages}
   }
   if(!service)return res.status(404).json({error:{code:'SERVICE_NOT_FOUND'}})
-  const basePack=service.packages.find(pack=>pack.id===parsed.data.packageId)
-  if(!basePack)return res.status(404).json({error:{code:'PACKAGE_NOT_FOUND'}})
-  const packageIndex=service.packages.findIndex(pack=>pack.id===parsed.data.packageId),packageOverride=storedPackages?.[packageIndex]
-  const pack=packageOverride?{...basePack,name:{ka:packageOverride.nameKa,en:packageOverride.nameEn},priceMinor:packageOverride.priceMinor,deliveryDays:packageOverride.deliveryDays}:parsed.data.packageId==='basic'&&override?{...basePack,priceMinor:override.priceMinor,deliveryDays:override.deliveryDays}:basePack
+  const storedPack=storedPackages.find(pack=>pack.key===parsed.data.packageId)
+  const staticPack=service.packages.find(pack=>pack.id===parsed.data.packageId)
+  if(!storedPack&&!staticPack)return res.status(404).json({error:{code:'PACKAGE_NOT_FOUND'}})
+  const pack=storedPack?{id:storedPack.key,name:{ka:storedPack.nameKa,en:storedPack.nameEn},priceMinor:storedPack.priceMinor,deliveryDays:storedPack.deliveryDays,features:storedPack.features.map(feature=>({ka:feature.textKa,en:feature.textEn}))}:parsed.data.packageId==='basic'&&override?{...staticPack!,priceMinor:override.priceMinor,deliveryDays:override.deliveryDays}:staticPack!
   const resolvedService=override&&!override.statusOnly?{...service,title:{ka:override.titleKa,en:override.titleEn}}:service
   const deliveryDate=new Date();deliveryDate.setUTCDate(deliveryDate.getUTCDate()+pack.deliveryDays)
   const provider=resolvedService.serviceSource==='VERIFIED_PROVIDER'?await prisma.user.findFirst({where:{providerSlug:resolvedService.providerSlug,role:'PROVIDER',providerStatus:'VERIFIED'},select:{id:true}}):null

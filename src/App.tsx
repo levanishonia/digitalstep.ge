@@ -20,6 +20,7 @@ import { AssistantPage } from './components/studio/AssistantPage'
 import { PlanGate } from './components/studio/PlanGate'
 import { AdminLayout } from './components/admin/AdminLayout'
 import { AdminAIUsage, AdminOrders, AdminOverview, AdminProviders, AdminServices, AdminSubscriptions, AdminUsers } from './components/admin/AdminPages'
+import { AdminServiceEditor } from './components/admin/AdminServiceEditor'
 import { NotFoundPage } from './components/NotFoundPage'
 import { locales, localePath } from './i18n'
 import { loadCatalogOverrides } from './lib/catalogOverrides'
@@ -39,7 +40,7 @@ export function App() {
   const authPage=segments[0]==='login'?<LoginPage locale={locale}/>:segments[0]==='register'?<RegisterPage locale={locale}/>:segments[0]==='forgot-password'?<ForgotPasswordPage locale={locale}/>:segments[0]==='verify-email'?<VerifyEmailPage locale={locale}/>:null
   if(authPage&&segments.length===1)return <AuthLayout locale={locale}>{authPage}</AuthLayout>
   if(segments[0]==='admin'){
-    const page=segments.length===1?<AdminOverview locale={locale}/>:segments.length===2&&segments[1]==='users'?<AdminUsers locale={locale}/>:segments.length===2&&segments[1]==='providers'?<AdminProviders locale={locale}/>:segments.length===2&&segments[1]==='services'?<AdminServices locale={locale}/>:segments.length===2&&segments[1]==='orders'?<AdminOrders locale={locale}/>:segments.length===2&&segments[1]==='subscriptions'?<AdminSubscriptions locale={locale}/>:segments.length===2&&segments[1]==='ai-usage'?<AdminAIUsage locale={locale}/>:<NotFoundPage locale={locale}/>
+    const page=segments.length===1?<AdminOverview locale={locale}/>:segments.length===2&&segments[1]==='users'?<AdminUsers locale={locale}/>:segments.length===2&&segments[1]==='providers'?<AdminProviders locale={locale}/>:segments.length===2&&segments[1]==='services'?<AdminServices locale={locale}/>:segments.length===3&&segments[1]==='services'&&segments[2]==='new'?<AdminServiceEditor locale={locale}/>:segments.length===4&&segments[1]==='services'&&segments[3]==='edit'?<AdminServiceEditor locale={locale} serviceId={segments[2]}/>:segments.length===2&&segments[1]==='orders'?<AdminOrders locale={locale}/>:segments.length===2&&segments[1]==='subscriptions'?<AdminSubscriptions locale={locale}/>:segments.length===2&&segments[1]==='ai-usage'?<AdminAIUsage locale={locale}/>:<NotFoundPage locale={locale}/>
     return <RequireRole locale={locale} role="ADMIN"><AdminLayout locale={locale}>{page}</AdminLayout></RequireRole>
   }
   if(segments[0]==='provider'){

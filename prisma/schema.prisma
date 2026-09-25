@@ -80,25 +80,25 @@ enum NotificationType {
 }
 
 model User {
-  id                          String               @id @default(cuid())
-  email                       String               @unique
+  id                          String                  @id @default(cuid())
+  email                       String                  @unique
   passwordHash                String
   firstName                   String
   lastName                    String
   phone                       String?
-  role                        UserRole             @default(CUSTOMER)
-  preferredLocale             String               @default("ka")
+  role                        UserRole                @default(CUSTOMER)
+  preferredLocale             String                  @default("ka")
   termsAcceptedAt             DateTime
-  createdAt                   DateTime             @default(now())
-  updatedAt                   DateTime             @updatedAt
+  createdAt                   DateTime                @default(now())
+  updatedAt                   DateTime                @updatedAt
   emailVerifiedAt             DateTime?
   emailVerificationCodes      EmailVerificationCode[]
-  orders                      Order[]              @relation("CustomerOrders")
-  providerSlug                String?              @unique
-  assignedOrders              Order[]              @relation("ProviderOrders")
-  providerStatus              ProviderStatus       @default(PENDING)
+  orders                      Order[]                 @relation("CustomerOrders")
+  providerSlug                String?                 @unique
+  assignedOrders              Order[]                 @relation("ProviderOrders")
+  providerStatus              ProviderStatus          @default(PENDING)
   providerProfile             ProviderProfile?
-  subscriptionPlan            SubscriptionPlan     @default(FREE)
+  subscriptionPlan            SubscriptionPlan        @default(FREE)
   manualPlanOverride          SubscriptionPlan?
   manualPlanOverrideExpiresAt DateTime?
   subscription                Subscription?
@@ -108,22 +108,22 @@ model User {
   aiReservations              AIUsageReservation[]
   aiGenerations               AIGeneration[]
   contentItems                ContentItem[]
-  customerConversations       Conversation[]       @relation("ConversationCustomer")
-  providerConversations       Conversation[]       @relation("ConversationProvider")
-  sentMessages                Message[]            @relation("MessageSender")
+  customerConversations       Conversation[]          @relation("ConversationCustomer")
+  providerConversations       Conversation[]          @relation("ConversationProvider")
+  sentMessages                Message[]               @relation("MessageSender")
   notifications               Notification[]
 }
 
 model EmailVerificationCode {
-  id                String   @id @default(cuid())
+  id                String    @id @default(cuid())
   userId            String
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  codeHash           String
-  expiresAt          DateTime
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash          String
+  expiresAt         DateTime
   resendAvailableAt DateTime
-  attempts           Int      @default(0)
-  usedAt             DateTime?
-  createdAt          DateTime @default(now())
+  attempts          Int       @default(0)
+  usedAt            DateTime?
+  createdAt         DateTime  @default(now())
 
   @@index([userId, createdAt])
   @@index([expiresAt])
@@ -403,28 +403,44 @@ model Message {
 /// immutable catalog id/source remain in code; administrators can only store
 /// an explicit, validated presentation/status override here.
 model CatalogServiceOverride {
-  serviceId       String         @id
-  titleKa         String
-  titleEn         String
-  descriptionKa   String
-  descriptionEn   String
-  category        String
-  priceMinor      Int
-  deliveryDays    Int
-  status          ServiceStatus  @default(ACTIVE)
+  serviceId         String             @id
+  titleKa           String
+  titleEn           String
+  descriptionKa     String
+  descriptionEn     String
+  fullDescriptionKa String             @default("")
+  fullDescriptionEn String             @default("")
+  category          String
+  serviceType       CatalogServiceType @default(ONE_TIME)
+  priceMinor        Int
+  deliveryDays      Int
+  status            ServiceStatus      @default(ACTIVE)
   /// Custom rows are administrator-created official services. Code-owned rows
   /// remain protected presentation overrides.
-  isCustom        Boolean        @default(false)
-  statusOnly      Boolean        @default(false)
-  slug            String?        @unique
-  serviceSource   ServiceSource  @default(DIGITAL_STEP)
-  packages        Json?
+  isCustom          Boolean            @default(false)
+  statusOnly        Boolean            @default(false)
+  slug              String?            @unique
+  serviceSource     ServiceSource      @default(DIGITAL_STEP)
+  packages          Json?
+  includedItems     Json?
+  processSteps      Json?
+  faqs              Json?
+  seoTitleKa        String?
+  seoTitleEn        String?
+  seoDescriptionKa  String?
+  seoDescriptionEn  String?
   /// Administrator-controlled homepage placement, independent from customer favorites.
-  isFeatured      Boolean        @default(false)
-  isPopular       Boolean        @default(false)
-  updatedAt       DateTime       @updatedAt
-  updatedByUserId String
-  media           ServiceMedia[]
+  isFeatured        Boolean            @default(false)
+  isPopular         Boolean            @default(false)
+  updatedAt         DateTime           @updatedAt
+  updatedByUserId   String
+  media             ServiceMedia[]
+}
+
+enum CatalogServiceType {
+  ONE_TIME
+  MONTHLY
+  CONSULTATION
 }
 
 enum ServiceMediaType {

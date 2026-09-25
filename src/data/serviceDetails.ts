@@ -1,8 +1,8 @@
 import type { Localized, Service } from './marketplace'
 import { catalogServices, isServicePublic } from './marketplace'
 
-export type PackageTier='basic'|'standard'|'premium'
-export interface ServicePackage { id:PackageTier; price:number; deliveryDays:number; revisions:number; description:Localized; features:Localized[] }
+export type PackageTier=string
+export interface ServicePackage { id:PackageTier; name?:Localized; price:number; deliveryDays:number; revisions:number; description:Localized; features:Localized[] }
 export interface GalleryItem { id:string; label:Localized; tone:string; video?:boolean; url?:string }
 export interface Review { id:string; author:string; rating:number; date:string; text:Localized; package:PackageTier }
 export interface Faq { id:string; question:Localized; answer:Localized }
