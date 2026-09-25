@@ -8,13 +8,24 @@ export type ServiceType = 'oneTime'|'monthly'|'consultation'
 export type ServiceSource = 'DIGITAL_STEP'|'VERIFIED_PROVIDER'
 export interface ServiceMedia { id:string;type:'IMAGE'|'VIDEO';url:string;width?:number|null;height?:number|null;duration?:number|null;sortOrder:number;isPrimary?:boolean }
 export interface Service { id: string; slug: string; title: Localized; description: Localized; provider: string; category: string; rating: number; reviews: number; price: number; deliveryDays: number; providerType: ProviderType; serviceSource:ServiceSource; providerStatus?:'PENDING'|'VERIFIED'|'SUSPENDED'; status?:'DRAFT'|'PENDING_REVIEW'|'ACTIVE'|'ARCHIVED'; isFeatured?:boolean; isPopular?:boolean; serviceType: ServiceType; badges: Badge[]; preview: string; createdOrder: number; media?:ServiceMedia[] }
-export const isServicePublic=(service:Pick<Service,'status'>)=>service.status===undefined||service.status==='ACTIVE'
+export const isServicePublic=(service:Pick<Service,'status'|'serviceSource'|'providerStatus'>)=>
+ (service.status===undefined||service.status==='ACTIVE')&&
+ (service.serviceSource==='DIGITAL_STEP'||service.providerStatus==='VERIFIED')
 export interface Goal { id: string; icon: IconName; title: Localized; description: Localized }
 export interface Step { id: string; icon: IconName; title: Localized; description: Localized }
 const l = (ka:string,en:string):Localized => ({ka,en})
 export const categories: Category[] = [
- ['marketing','megaphone','მარკეტინგი','Marketing',24],['web','code','ვებსაიტების შექმნა','Website Development',18],['design','palette','დიზაინი','Design',31],['social','share','სოციალური მედია','Social Media',22],['seo','search','SEO','SEO',14],['advertising','ads','რეკლამა','Advertising',16],['video','video','ვიდეო და ანიმაცია','Video & Animation',12],['automation','workflow','ავტომატიზაცია','Automation',9],['ai','sparkles','AI მომსახურებები','AI Services',11],['consulting','briefcase','ბიზნეს კონსულტაცია','Business Consulting',8],
-].map(([id,icon,ka,en,count])=>({id:id as string,icon:icon as IconName,name:l(ka as string,en as string),description:l('შერჩეული ციფრული გადაწყვეტილებები','Curated digital solutions'),count:count as number}))
+ ['marketing','megaphone','მარკეტინგი','Marketing','სტრატეგია, კონტენტი და კამპანიები ბიზნესის ზრდისთვის.','Strategy, content, and campaigns built for business growth.'],
+ ['web','code','ვებსაიტების შექმნა','Website Development','თანამედროვე ვებსაიტები და ციფრული პროდუქტები.','Modern websites and digital products.'],
+ ['design','palette','დიზაინი','Design','ბრენდისთვის გამართული ვიზუალური იდენტობა და დიზაინი.','Visual identity and design for a consistent brand.'],
+ ['social','share','სოციალური მედია','Social Media','სოციალური ქსელების მართვა, კონტენტი და განვითარება.','Social channel management, content, and growth.'],
+ ['seo','search','SEO','SEO','ძიებაში ხილვადობა, აუდიტი და პრაქტიკული ოპტიმიზაცია.','Search visibility, audits, and practical optimization.'],
+ ['advertising','ads','რეკლამა','Advertising','Meta და Google კამპანიები და რეკლამის ოპტიმიზაცია.','Meta and Google campaigns with ongoing optimization.'],
+ ['video','video','ვიდეო და ანიმაცია','Video & Animation','ვიდეო კონტენტი სოციალური ქსელებისა და კამპანიებისთვის.','Video content for social channels and campaigns.'],
+ ['automation','workflow','ავტომატიზაცია','Automation','რუტინული პროცესების გამარტივება და დაკავშირება.','Streamlined, connected everyday business processes.'],
+ ['ai','sparkles','AI მომსახურებები','AI Services','AI ინსტრუმენტები და ბიზნეს პროცესების გაუმჯობესება.','AI tools and improved business workflows.'],
+ ['consulting','briefcase','ბიზნეს კონსულტაცია','Business Consulting','პრაქტიკული მიმართულება სტრატეგიისა და ზრდისთვის.','Practical guidance for strategy and growth.'],
+].map(([id,icon,ka,en,descriptionKa,descriptionEn])=>({id,icon:icon as IconName,name:l(ka,en),description:l(descriptionKa,descriptionEn),count:0}))
 export const popularServices: Service[] = [
  {id:'social-management',slug:'social-media-management',title:l('სოციალური მედიის მართვა','Social Media Management'),description:l('სტრატეგია, კონტენტი და ყოველდღიური მართვა შენი ბრენდისთვის.','Strategy, content, and day-to-day management for your brand.'),provider:'Growth Studio',category:'social',rating:4.9,reviews:84,price:299,deliveryDays:3,providerType:'agency',serviceSource:'VERIFIED_PROVIDER',providerStatus:'VERIFIED',serviceType:'monthly',badges:['popular','fastDelivery'],preview:'social',createdOrder:8},
  {id:'business-website',slug:'business-website-development',title:l('ბიზნეს ვებსაიტის შექმნა','Business Website Development'),description:l('სწრაფი, თანამედროვე და მობილურზე მორგებული ბიზნეს ვებსაიტი.','A fast, modern, mobile-ready website for your business.'),provider:'WebCraft',category:'web',rating:4.8,reviews:61,price:799,deliveryDays:7,providerType:'agency',serviceSource:'VERIFIED_PROVIDER',providerStatus:'VERIFIED',serviceType:'oneTime',badges:['popular'],preview:'web',createdOrder:6},
