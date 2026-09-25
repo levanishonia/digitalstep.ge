@@ -6,7 +6,7 @@ export interface ServicePackage { id:PackageTier; name?:Localized; price:number;
 export interface GalleryItem { id:string; label:Localized; tone:string; video?:boolean; url?:string }
 export interface Review { id:string; author:string; rating:number; date:string; text:Localized; package:PackageTier }
 export interface Faq { id:string; question:Localized; answer:Localized }
-export interface ServiceDetail { serviceId:string; providerSlug:string; longDescription:Localized; gallery:GalleryItem[]; packages:ServicePackage[]; included:Localized[]; process:Localized[]; reviews:Review[]; faq:Faq[]; relatedIds:string[] }
+export interface ServiceDetail { serviceId:string; providerSlug:string; longDescription:Localized; gallery:GalleryItem[]; packages:ServicePackage[]; included:Localized[]; process:Localized[]; reviews:Review[]; faq:Faq[]; relatedIds:string[]; adminManaged?:boolean; seoTitle?:Localized; seoDescription?:Localized }
 export interface PortfolioItem { id:string; title:Localized; category:Localized; description:Localized; tone:string }
 export interface Provider { id:string; slug:string; name:string; type:Localized; tagline:Localized; description:Localized; location:Localized; responseTime:Localized; completedProjects:number; specializations:Localized[]; languages:string[]; portfolio:PortfolioItem[]; reviews:Review[] }
 const l=(ka:string,en:string):Localized=>({ka,en})
@@ -61,4 +61,9 @@ export const getServiceBySlug=(slug:string)=>catalogServices.find(service=>servi
 export const getServiceDetail=(serviceId:string)=>serviceDetails.find(detail=>detail.serviceId===serviceId)
 export const getProviderBySlug=(slug:string)=>providers.find(provider=>provider.slug===slug)
 export const getServicesByProvider=(provider:Provider):Service[]=>catalogServices.filter(service=>service.provider===provider.name&&isServicePublic(service))
-export const getRelatedServices=(detail:ServiceDetail):Service[]=>detail.relatedIds.map(id=>catalogServices.find(service=>service.id===id&&isServicePublic(service))).filter((service):service is Service=>Boolean(service))
+export const getRelatedServices=(detail:ServiceDetail):Service[]=>{
+ const current=catalogServices.find(service=>service.id===detail.serviceId)
+ const explicit=detail.relatedIds.map(id=>catalogServices.find(service=>service.id===id&&service.id!==detail.serviceId&&isServicePublic(service))).filter((service):service is Service=>Boolean(service))
+ const category=catalogServices.filter(service=>service.id!==detail.serviceId&&service.category===current?.category&&isServicePublic(service))
+ return [...new Map([...explicit,...category].map(service=>[service.id,service])).values()].slice(0,4)
+}
