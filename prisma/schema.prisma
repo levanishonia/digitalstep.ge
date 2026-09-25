@@ -419,6 +419,9 @@ model CatalogServiceOverride {
   slug            String?        @unique
   serviceSource   ServiceSource  @default(DIGITAL_STEP)
   packages        Json?
+  /// Administrator-controlled homepage placement, independent from customer favorites.
+  isFeatured      Boolean        @default(false)
+  isPopular       Boolean        @default(false)
   updatedAt       DateTime       @updatedAt
   updatedByUserId String
   media           ServiceMedia[]
@@ -440,12 +443,15 @@ model ServiceMedia {
   height    Int?
   duration  Float?
   sortOrder Int                    @default(0)
+  isPrimary Boolean                @default(false)
   createdAt DateTime               @default(now())
 
   @@index([serviceId, sortOrder])
 }
 
 enum ServiceStatus {
+  DRAFT
+  PENDING_REVIEW
   ACTIVE
   ARCHIVED
 }
