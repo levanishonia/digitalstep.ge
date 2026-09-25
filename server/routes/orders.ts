@@ -16,10 +16,10 @@ ordersRouter.post('/',async(req,res,next)=>{
   const staticService=findOrderService(parsed.data.serviceSlug)
   const override=staticService?await prisma.catalogServiceOverride.findUnique({where:{serviceId:staticService.id}}):await prisma.catalogServiceOverride.findFirst({where:{slug:parsed.data.serviceSlug,isCustom:true}})
   if(override&&override.status!=='ACTIVE')return res.status(404).json({error:{code:'SERVICE_NOT_FOUND'}})
-  const storedPackages=Array.isArray(override?.packages)?override.packages as Array<{nameKa:string;nameEn:string;priceMinor:number;deliveryDays:number;featuresKa:string[];featuresEn:string[]}>:null
+  const storedPackages=Array.isArray(override?.packages)?override.packages as Array<{key:string;nameKa:string;nameEn:string;priceMinor:number;deliveryDays:number;features:{textKa:string;textEn:string}[]}>:null
   let service:OrderCatalogService|undefined=staticService
   if(!service&&override?.isCustom&&override.slug){
-   const packages:OrderCatalogPackage[]=(storedPackages?.length?storedPackages:[{nameKa:'საბაზისო',nameEn:'Basic',priceMinor:override.priceMinor,deliveryDays:override.deliveryDays,featuresKa:['Digital Step მხარდაჭერა'],featuresEn:['Digital Step support']}]).map((pack,index)=>({id:(['basic','standard','premium'][index]??'premium') as OrderCatalogPackage['id'],name:{ka:pack.nameKa,en:pack.nameEn},priceMinor:pack.priceMinor,deliveryDays:pack.deliveryDays,features:pack.featuresKa.map((ka,i)=>({ka,en:pack.featuresEn[i]??ka}))}))
+   const packages:OrderCatalogPackage[]=(storedPackages??[]).map(pack=>({id:pack.key,name:{ka:pack.nameKa,en:pack.nameEn},priceMinor:pack.priceMinor,deliveryDays:pack.deliveryDays,features:pack.features.map(feature=>({ka:feature.textKa,en:feature.textEn}))}))
    service={id:override.serviceId,slug:override.slug,title:{ka:override.titleKa,en:override.titleEn},providerName:'Digital Step Team',providerSlug:'digital-step-team',serviceSource:'DIGITAL_STEP',status:override.status,packages}
   }
   if(!service)return res.status(404).json({error:{code:'SERVICE_NOT_FOUND'}})
