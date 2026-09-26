@@ -7,7 +7,4 @@ const descriptions={ka:{FREE:'Studio-ს გასაცნობად და A
 export const getPlanLabel=(plan:SubscriptionPlan)=>plan
 export const getFeatureLabel=(feature:StudioFeature,locale:Locale)=>featureLabels[locale][feature]
 export const getPlanDescription=(plan:SubscriptionPlan,locale:Locale)=>descriptions[locale][plan]
-export type SubscriptionStatus='ACTIVE'|'FREE'|'INCOMPLETE'|'PAST_DUE'|'CANCELLED'|'EXPIRED'
-const statusLabels={ka:{ACTIVE:'აქტიური',FREE:'უფასო',INCOMPLETE:'დაუსრულებელი',PAST_DUE:'გადახდა ვადაგადაცილებულია',CANCELLED:'გაუქმებული',EXPIRED:'ვადაგასული'},en:{ACTIVE:'Active',FREE:'Free',INCOMPLETE:'Incomplete',PAST_DUE:'Payment past due',CANCELLED:'Cancelled',EXPIRED:'Expired'}} as const
-export const getSubscriptionStatusLabel=(status:SubscriptionStatus,locale:Locale)=>statusLabels[locale][status]
 export function formatFeatureAllowance(plan:SubscriptionPlan,feature:StudioFeature,locale:Locale){if(!planDefinitions[plan].features.includes(feature))return locale==='ka'?'არ შედის':'Not included';const metric=featureMetric[feature];if(!metric)return locale==='ka'?'შედის':'Included';const value=planDefinitions[plan].limits[metric];const unit=feature==='AI_ASSISTANT'?(locale==='ka'?'კითხვა':'questions'):(locale==='ka'?'გენერაცია':'generations');return `${value} ${unit} / ${locale==='ka'?'თვე':'month'}`}
