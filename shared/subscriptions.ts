@@ -1,5 +1,6 @@
 export const subscriptionPlans = ['FREE', 'PRO', 'BUSINESS'] as const
 export type SubscriptionPlan = typeof subscriptionPlans[number]
+export const subscriptionPlanRank:Record<SubscriptionPlan,number>={FREE:0,PRO:1,BUSINESS:2}
 export const studioFeatures = ['AI_ASSISTANT','POST_GENERATOR','CONTENT_CALENDAR','CONTENT_IDEAS','MARKETING_PLANNER','BUSINESS_ANALYSIS'] as const
 export type StudioFeature = typeof studioFeatures[number]
 export type UsageMetric = 'AI_REQUESTS'|'POST_GENERATIONS'|'CONTENT_IDEA_GENERATIONS'|'MARKETING_PLAN_GENERATIONS'|'BUSINESS_ANALYSIS_GENERATIONS'

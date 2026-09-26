@@ -1,9 +1,13 @@
 import { Router } from 'express'
 import { requireAuth } from '../middleware/auth.js'
 import { prisma } from '../lib/prisma.js'
-import { type StudioFeature, type UsageMetric } from '../../shared/subscriptions.js'
+import { subscriptionPlanRank, type StudioFeature, type UsageMetric } from '../../shared/subscriptions.js'
 import { billingProvider } from '../billing/provider.js'
 import { getSubscriptionState } from '../billing/subscriptionService.js'
+import { rateLimit } from 'express-rate-limit'
+import { z } from 'zod'
+import { sendTransactionalEmail } from '../email/service.js'
+import { subscriptionRequestTemplate } from '../email/templates.js'
 
 export const subscriptionRouter = Router()
 subscriptionRouter.use(requireAuth)
@@ -27,4 +31,18 @@ subscriptionRouter.get('/', async (request,response,next) => {
     })
     return response.json({data:{plan:effective.plan,source:effective.source,status:user.subscription?.status??(effective.source==='MANUAL_OVERRIDE'?'ACTIVE':'FREE'),billingEnabled:billingProvider.configured,provider:user.subscription?.billingProvider??null,currentPeriodStart:user.subscription?.currentPeriodStart??null,currentPeriodEnd:user.subscription?.currentPeriodEnd??null,cancelAtPeriodEnd:user.subscription?.cancelAtPeriodEnd??false,manualOverrideExpiresAt:user.manualPlanOverrideExpiresAt??null,period,features:Object.fromEntries(definition.features.map(feature=>[feature,true])),usage}})
   } catch(error){next(error)}
+})
+
+const requestLimiter=rateLimit({windowMs:15*60_000,limit:3,standardHeaders:true,legacyHeaders:false,message:{error:{code:'RATE_LIMITED'}}})
+const requestSchema=z.object({plan:z.enum(['PRO','BUSINESS']),message:z.string().trim().max(1000).optional()})
+subscriptionRouter.post('/upgrade-request',requestLimiter,async(request,response)=>{
+  const parsed=requestSchema.safeParse(request.body)
+  if(!parsed.success)return response.status(400).json({error:{code:'INVALID_UPGRADE_REQUEST'}})
+  const [user,state]=await Promise.all([prisma.user.findUnique({where:{id:request.auth!.userId},select:{firstName:true,lastName:true,email:true}}),getSubscriptionState(request.auth!.userId)])
+  if(!user||!state)return response.status(401).json({error:{code:'UNAUTHENTICATED'}})
+  if(subscriptionPlanRank[parsed.data.plan]<=subscriptionPlanRank[state.effective.plan])return response.status(409).json({error:{code:'PLAN_NOT_UPGRADE'}})
+  const recipient=process.env.SUBSCRIPTION_REQUEST_RECIPIENT_EMAIL
+  if(!recipient)return response.status(503).json({error:{code:'UPGRADE_REQUEST_UNAVAILABLE'}})
+  try{await sendTransactionalEmail({to:recipient,recipientName:'Digital Step',template:'studio-plan-request',content:subscriptionRequestTemplate({name:`${user.firstName} ${user.lastName}`,email:user.email,currentPlan:state.effective.plan,requestedPlan:parsed.data.plan,message:parsed.data.message,timestamp:new Date()})});return response.status(201).json({data:{received:true}})}
+  catch{return response.status(502).json({error:{code:'UPGRADE_REQUEST_DELIVERY_FAILED'}})}
 })

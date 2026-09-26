@@ -56,7 +56,7 @@ export function App() {
     return <RequireAuth locale={locale}><DashboardLayout locale={locale}><StudioLayout locale={locale}>{page}</StudioLayout></DashboardLayout></RequireAuth>
   }
   if(segments[0]==='business'&&segments.length===1)return <RequireAuth locale={locale}><DashboardLayout locale={locale}><BusinessPage locale={locale}/></DashboardLayout></RequireAuth>
-  if(segments[0]==='pricing'&&segments.length===1)return <RequireAuth locale={locale}><DashboardLayout locale={locale}><PricingPage locale={locale}/></DashboardLayout></RequireAuth>
+  if(segments[0]==='pricing'&&segments.length===1)return <MarketplaceShell locale={locale} contentOverride={<PricingPage locale={locale}/>}/>
   if(segments[0]==='billing'&&['success','cancel'].includes(segments[1])&&segments.length===2)return <BillingReturnPage locale={locale} outcome={segments[1] as 'success'|'cancel'}/>
   return <MarketplaceShell locale={locale} />
 }

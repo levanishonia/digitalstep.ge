@@ -13,3 +13,7 @@ export async function createCheckout(plan:'PRO'|'BUSINESS'):Promise<{redirectUrl
   if(!response.ok||!body?.data)throw new Error(body?.error?.code??'CHECKOUT_CREATION_FAILED')
   return body.data
 }
+export async function requestPlan(plan:'PRO'|'BUSINESS',message:string):Promise<void>{
+  const response=await fetch('/api/subscription/upgrade-request',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,message:message.trim()||undefined})})
+  if(!response.ok)throw new Error('UPGRADE_REQUEST_FAILED')
+}
